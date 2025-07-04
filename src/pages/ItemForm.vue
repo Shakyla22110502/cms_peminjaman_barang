@@ -4,26 +4,26 @@
 
     <form @submit.prevent="handleSubmit">
       <div class="mb-4">
-        <label class="block">Nama</label>
-        <input v-model="form.name" type="text" class="w-full border p-2 rounded" />
+        <label class="block font-medium mb-1 text-gray-700">Nama</label>
+        <input v-model="form.name" type="text" class="w-full border-gray-300 rounded-lg shadow-sm focus:ring-blue-500 focus:border-blue-500 px-4 py-2" />
       </div>
 
       <div class="mb-4">
-        <label class="block">Kode Serial</label>
-        <input v-model="form.serial_code" type="text" class="w-full border p-2 rounded" />
+        <label class="block font-medium mb-1 text-gray-700">Kode Serial</label>
+        <input v-model="form.serial_code" type="text" class="w-full border-gray-300 rounded-lg shadow-sm focus:ring-blue-500 focus:border-blue-500 px-4 py-2" />
       </div>
 
       <div class="mb-4">
-        <label class="block">Status Ketersediaan</label>
-        <select v-model="form.is_available" class="w-full border p-2 rounded">
+        <label class="block font-medium mb-1 text-gray-700">Status Ketersediaan</label>
+        <select v-model="form.is_available" class="w-full border-gray-300 rounded-lg shadow-sm focus:ring-blue-500 focus:border-blue-500 px-4 py-2">
           <option :value="true">Tersedia</option>
           <option :value="false">Dipinjam</option>
         </select>
       </div>
 
       <div class="mb-4">
-        <label class="block">Aktif</label>
-        <select v-model="form.is_active" class="w-full border p-2 rounded">
+        <label class="block font-medium mb-1 text-gray-700">Aktif</label>
+        <select v-model="form.is_active" class="w-full border-gray-300 rounded-lg shadow-sm focus:ring-blue-500 focus:border-blue-500 px-4 py-2">
           <option :value="true">Ya</option>
           <option :value="false">Tidak</option>
         </select>
@@ -31,15 +31,15 @@
 
        <!-- Submit + Cancel -->
       <div class="flex gap-2">
-        <button type="submit" class="bg-blue-600 text-white px-4 py-2 rounded">
+        <button type="submit" class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition">
           {{ isEdit ? 'Update' : 'Simpan' }}
         </button>
         <button
           type="button"
           @click="router.back()"
-          class="bg-gray-300 text-gray-800 px-4 py-2 rounded"
+          class="px-4 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 transition"
         >
-          Cancel
+          Batal
         </button>
       </div>
     </form>

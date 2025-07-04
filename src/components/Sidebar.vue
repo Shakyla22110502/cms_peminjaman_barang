@@ -48,6 +48,22 @@
       >
         Manajemen Permission
       </RouterLink>
+
+      <RouterLink
+       v-if="hasPermission('manage rooms')"
+        to="/rooms"
+        class="block px-4 py-2 rounded hover:bg-blue-700"
+      >
+        Manajemen Ruangan
+      </RouterLink>
+
+      <RouterLink
+        v-if="hasPermission('manage room-loans')"
+        to="/room-loans"
+        class="block px-4 py-2 rounded hover:bg-blue-700"
+      >
+        Manajemen Peminjaman Ruangan
+      </RouterLink>
     </nav>
   </aside>
 </template>

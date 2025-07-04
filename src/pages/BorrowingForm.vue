@@ -1,5 +1,5 @@
 <template>
-  <div class="p-6 bg-white shadow rounded">
+  <div class="max-w-xl mx-auto bg-white p-6 rounded shadow">
     <h2 class="text-xl font-bold mb-4">
       {{ isEdit ? 'Edit Peminjaman' : 'Tambah Peminjaman' }}
     </h2>
@@ -7,8 +7,8 @@
     <form @submit.prevent="submit">
       <!-- Peminjam -->
       <div class="mb-4">
-        <label class="block mb-1">Peminjam</label>
-        <select v-model="form.users_id" class="w-full p-2 border rounded" required>
+        <label class="block font-medium mb-1 text-gray-700">Peminjam</label>
+        <select v-model="form.users_id" class="w-full border-gray-300 rounded-lg shadow-sm focus:ring-blue-500 focus:border-blue-500 px-4 py-2" required>
           <option disabled value="">Pilih Peminjam</option>
           <option v-for="user in users" :key="user.id" :value="user.id">
             {{ user.name }} ({{ user.code }})
@@ -18,8 +18,8 @@
 
       <!-- Barang -->
       <div class="mb-4">
-        <label class="block mb-1">Barang</label>
-        <select v-model="form.item_id" class="w-full p-2 border rounded" required>
+        <label class="block font-medium mb-1 text-gray-700">Barang</label>
+        <select v-model="form.item_id" class="w-full border-gray-300 rounded-lg shadow-sm focus:ring-blue-500 focus:border-blue-500 px-4 py-2" required>
           <option disabled value="">Pilih Barang</option>
           <option v-for="item in items" :key="item.id" :value="item.id">
             {{ item.name }} - {{ item.serial_code }}
@@ -29,31 +29,31 @@
 
       <!-- Tanggal Pinjam -->
       <div class="mb-4">
-        <label class="block mb-1">Tanggal Pinjam</label>
+        <label class="block font-medium mb-1 text-gray-700">Tanggal Pinjam</label>
         <input
           type="date"
           v-model="form.borrow_date"
-          class="w-full p-2 border rounded"
+          class="w-full border-gray-300 rounded-lg shadow-sm focus:ring-blue-500 focus:border-blue-500 px-4 py-2"
           required
         />
       </div>
 
       <!-- Tanggal Kembali -->
       <div class="mb-4">
-        <label class="block mb-1">Tanggal Kembali</label>
+        <label class="block font-medium mb-1 text-gray-700">Tanggal Kembali</label>
         <input
           type="date"
           v-model="form.return_date"
-          class="w-full p-2 border rounded"
+          class="w-full border-gray-300 rounded-lg shadow-sm focus:ring-blue-500 focus:border-blue-500 px-4 py-2"
         />
       </div>
 
       <!-- Tombol Aksi -->
       <div class="flex gap-2">
-        <button type="submit" class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">
+        <button type="submit" class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition">
           Simpan
         </button>
-        <button type="button" @click="router.push('/borrowings')" class="px-4 py-2 border rounded">
+        <button type="button" @click="router.push('/borrowings')" class="px-4 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 transition">
           Batal
         </button>
       </div>

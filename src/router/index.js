@@ -11,6 +11,10 @@ import BorrowingList from '../pages/BorrowingList.vue'
 import Roles from '../pages/RolesList.vue'
 import PermissionsList from '../pages/PermissionsList.vue'
 import { useUserStore } from '../stores/UserStore'
+import RoomForm from '../pages/RoomForm.vue'
+import RoomList from '../pages/RoomList.vue'
+import RoomLoanList from '../pages/RoomLoanList.vue'
+import RoomLoanForm from '../pages/RoomLoanForm.vue'
 
 const routes = [
   {
@@ -62,6 +66,8 @@ const routes = [
         component: BorrowingForm,
         props: true,
       },
+
+      // Roles & Permissions
       {
         path: '/roles',
         component: Roles,
@@ -79,6 +85,68 @@ const routes = [
           requiresAuth: true,
         },
       },
+
+      // Rooms
+      {
+        path: '/rooms',
+        name: 'RoomList',
+        component: RoomList,
+        meta: {
+          requiresAuth: true,
+          requiredPermission: 'view-room',
+        },
+      },
+      {
+        path: '/rooms/create',
+        name: 'RoomCreate',
+        component: RoomForm,
+        meta: {
+          requiresAuth: true,
+          requiredPermission: 'create-room',
+        },
+      },
+      {
+        path: '/rooms/:id/edit',
+        name: 'RoomEdit',
+        component: RoomForm,
+        props: true,
+        meta: {
+          requiresAuth: true,
+          requiredPermission: 'edit-room',
+        },
+      },
+
+      // Room Loans
+      {
+        path: '/room-loans',
+        name: 'RoomLoanList',
+        component: RoomLoanList,
+        meta: {
+          requiresAuth: true,
+          requiredPermission: 'view-room-loans',
+        },
+      },
+      {
+        path: '/room-loans/create',
+        name: 'RoomLoanCreate',
+        component: RoomLoanForm,
+        meta: {
+          requiresAuth: true,
+          requiredPermission: 'create-room-loans',
+        },
+      },
+      {
+        path: '/room-loans/:id/edit',
+        name: 'RoomLoanEdit',
+        component: RoomLoanForm,
+        props: true,
+        meta: {
+          requiresAuth: true,
+          requiredPermission: 'edit-room-loans',
+        },
+      },
+
+      // Unauthorized
       {
         path: '/unauthorized',
         name: 'Unauthorized',
@@ -117,7 +185,7 @@ router.beforeEach((to, from, next) => {
 
     if (!hasPermission) {
       alert('Anda tidak memiliki izin untuk mengakses halaman ini.')
-      return next({ name: 'Unauthorized' }) // atau langsung next('/') jika tidak buat halaman khusus
+      return next({ name: 'Unauthorized' })
     }
   }
 

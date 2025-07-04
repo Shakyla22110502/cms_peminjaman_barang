@@ -48,6 +48,24 @@
                 <p class="text-2xl font-bold text-gray-800">{{ totalPermissions }}</p>
               </div>
             </div>
+            <div class="flex items-center space-x-4">
+              <div class="bg-indigo-100 text-indigo-600 p-3 rounded-lg">
+                🏦
+              </div>
+              <div>
+                <p class="text-sm text-gray-500">Total Room</p>
+                <p class="text-2xl font-bold text-gray-800">{{ totalRooms }}</p>
+              </div>
+            </div>
+            <div class="flex items-center space-x-4">
+              <div class="bg-indigo-100 text-indigo-600 p-3 rounded-lg">
+                🏦
+              </div>
+              <div>
+                <p class="text-sm text-gray-500">Total Ruangan Dipinjam</p>
+                <p class="text-2xl font-bold text-gray-800">{{ totalRoomsLoan }}</p>
+              </div>
+            </div>
           </div>
         </div>
         
@@ -66,18 +84,24 @@ const totalItems = ref(0)
 const availableItems = ref(0)
 const totalRoles = ref(0)
 const totalPermissions = ref(0)
+const totalRooms = ref(0)
+const totalRoomsLoan = ref(0)
 
 const loadDashboardData = async () => {
   try {
-    const [itemsRes, rolesRes, permissionsRes] = await Promise.all([
+    const [itemsRes, rolesRes, permissionsRes,roomsRes,roomsloanRes] = await Promise.all([
       axios.get('/items'),
       axios.get('/roles'),
-      axios.get('/permissions')
+      axios.get('/permissions'),
+      axios.get('/rooms'),
+      axios.get('/room-loans')
     ])
     totalItems.value = itemsRes.data.data.length
     availableItems.value = itemsRes.data.data.filter(i => i.is_available).length
     totalRoles.value = rolesRes.data.length
     totalPermissions.value = permissionsRes.data.length
+    totalRooms.value = roomsRes.data.length
+    totalRoomsLoan.value = roomsloanRes.data.length
   } catch (error) {
     console.error('Gagal memuat data dashboard:', error)
   }
