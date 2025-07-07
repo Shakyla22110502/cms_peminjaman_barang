@@ -1,6 +1,7 @@
 <template>
   <div class="min-h-screen bg-gray-50 p-6">
     <div class="max-w-7xl mx-auto">
+      <!-- Header -->
       <div
         class="bg-white rounded-lg shadow-sm border p-6 mb-6 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4"
       >
@@ -24,15 +25,15 @@
         </router-link>
       </div>
 
+      <!-- Tabel -->
       <div class="bg-white rounded-lg shadow border overflow-x-auto">
-
-        
-        <table class="min-w-full divide-y divide-gray-200 ">
+        <table class="min-w-full divide-y divide-gray-200">
           <thead class="bg-gray-50">
             <tr>
               <th class="px-6 py-3 text-left font-semibold text-gray-700">Nama</th>
               <th class="px-6 py-3 text-left font-semibold text-gray-700">Lokasi</th>
               <th class="px-6 py-3 text-left font-semibold text-gray-700">Kapasitas</th>
+              <th class="px-6 py-3 text-left font-semibold text-gray-700">Deskripsi</th>
               <th class="px-6 py-3 text-left font-semibold text-gray-700">Status</th>
               <th class="px-6 py-3 text-left font-semibold text-gray-700">Aksi</th>
             </tr>
@@ -42,11 +43,10 @@
               <td class="px-6 py-4">{{ room.name }}</td>
               <td class="px-6 py-4">{{ room.location }}</td>
               <td class="px-6 py-4">{{ room.capacity }}</td>
+              <td class="px-6 py-4">{{ room.description || '-' }}</td>
               <td class="px-6 py-4">
                 <span
-                  :class="
-                    room.is_active ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'
-                  "
+                  :class="room.is_active ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'"
                   class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium"
                 >
                   {{ room.is_active ? 'Aktif' : 'Nonaktif' }}
@@ -73,25 +73,20 @@
                   @click="deleteRoom(room.id)"
                   class="inline-flex items-center px-3 py-1.5 border border-red-300 shadow-sm text-xs font-medium rounded-md text-red-700 bg-red-50 hover:bg-red-100"
                 >
-                 <svg
-                        class="w-3 h-3 mr-1"
-                        fill="none"
-                        stroke="currentColor"
-                        viewBox="0 0 24 24"
-                      >
-                        <path
-                          stroke-linecap="round"
-                          stroke-linejoin="round"
-                          stroke-width="2"
-                          d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
-                        />
-                      </svg>
+                  <svg class="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      stroke-width="2"
+                      d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
+                    />
+                  </svg>
                   Hapus
                 </button>
               </td>
             </tr>
             <tr v-if="rooms.length === 0">
-              <td colspan="5" class="text-center py-6 text-gray-500">Belum ada ruangan</td>
+              <td colspan="6" class="text-center py-6 text-gray-500">Belum ada ruangan</td>
             </tr>
           </tbody>
         </table>
@@ -101,7 +96,7 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue'
+import { ref, onMounted, computed } from 'vue'
 import axios from '../services/api'
 import { useUserStore } from '../stores/UserStore'
 
@@ -109,10 +104,6 @@ const userStore = useUserStore()
 const hasPermission = (perm) => userStore.permissions.includes(perm)
 
 const rooms = ref([])
-
-const availableRooms = computed(() => rooms.value.filter(room => room.is_available).length)
-const borrowedRooms = computed(() => rooms.value.filter(room => !room.is_available).length)
-const inactiveRooms = computed(() => rooms.value.filter(room => !room.is_active).length)
 
 const getRooms = async () => {
   const res = await axios.get('/rooms')

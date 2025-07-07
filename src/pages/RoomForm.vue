@@ -89,9 +89,13 @@ const roomId = route.params.id
 onMounted(async () => {
   if (roomId) {
     const res = await axios.get(`/rooms/${roomId}`)
-    form.value = { ...res.data.data }
+    form.value = {
+      ...res.data,
+      is_active: !!res.data.is_active
+    }
   }
 })
+
 
 const saveRoom = async () => {
   if (!form.value.name) return
