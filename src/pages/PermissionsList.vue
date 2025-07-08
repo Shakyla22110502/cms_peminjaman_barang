@@ -13,7 +13,7 @@
           class="inline-flex items-center px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-lg shadow-sm transition-colors duration-200"
         >
           <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
           </svg>
           Tambah Permission
         </button>
@@ -44,6 +44,17 @@
         </form>
       </div>
 
+      <!-- Filter -->
+      <div class="bg-white rounded-lg border p-4 mb-4 max-w-md">
+        <label class="block text-sm font-medium text-gray-700 mb-1">Cari Permission</label>
+        <input
+          v-model="search"
+          type="text"
+          placeholder="Masukkan nama permission"
+          class="w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+        />
+      </div>
+
       <!-- Table Section -->
       <div class="bg-white rounded-lg shadow-sm border overflow-hidden">
         <div class="px-6 py-4 border-b border-gray-200">
@@ -59,7 +70,7 @@
               </tr>
             </thead>
             <tbody class="bg-white divide-y divide-gray-200">
-              <tr v-for="(item, index) in permissions" :key="item.id" class="hover:bg-gray-50 transition-colors duration-150">
+              <tr v-for="(item, index) in filteredPermissions" :key="item.id" class="hover:bg-gray-50 transition-colors duration-150">
                 <td class="px-6 py-4 text-sm text-gray-900">{{ index + 1 }}</td>
                 <td class="px-6 py-4 text-sm text-gray-900">{{ item.name }}</td>
                 <td class="px-6 py-4 text-right text-sm font-medium">
@@ -73,9 +84,9 @@
                   </div>
                 </td>
               </tr>
-              <tr v-if="permissions.length === 0 && !loading">
+              <tr v-if="filteredPermissions.length === 0 && !loading">
                 <td colspan="3" class="px-6 py-12 text-center text-sm text-gray-500">
-                  Belum ada data permission.
+                  Tidak ada permission ditemukan.
                 </td>
               </tr>
               <tr v-if="loading">
@@ -92,7 +103,7 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue'
+import { ref, computed, onMounted } from 'vue'
 import axios from '@/services/api'
 import { useUserStore } from '../stores/UserStore'
 
@@ -103,6 +114,7 @@ const permissions = ref([])
 const formVisible = ref(false)
 const editing = ref(false)
 const loading = ref(false)
+const search = ref('')
 const form = ref({ id: null, name: '' })
 
 const fetchPermissions = async () => {
@@ -171,8 +183,14 @@ const deletePermission = async (id) => {
   }
 }
 
+// Filter berdasarkan search
+const filteredPermissions = computed(() => {
+  return permissions.value.filter((item) =>
+    item.name.toLowerCase().includes(search.value.toLowerCase())
+  )
+})
+
 onMounted(() => {
   fetchPermissions()
 })
 </script>
-

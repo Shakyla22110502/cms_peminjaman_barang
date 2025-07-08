@@ -26,6 +26,28 @@
         </div>
       </div>
 
+      <!-- Filter Section -->
+      <div class="bg-white rounded-lg shadow-sm border p-6 mb-6 grid md:grid-cols-4 gap-4">
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-1">Peran</label>
+          <select v-model="filters.role" class="w-full sm:w-64 px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm">
+            <option value="">Semua</option>
+            <option value="super-admin">Super Admin</option>
+            <option value="admin">Admin</option>
+            <option value="user">User</option>
+          </select>
+        </div>
+        <div class="md:col-span-3">
+          <label class="block text-sm font-medium text-gray-700 mb-1">Cari Nama / Email</label>
+          <input
+            v-model="filters.search"
+            type="text"
+            placeholder="Cari..."
+            class="w-full sm:w-64 px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+          />
+        </div>
+      </div>
+
       <!-- Table Section -->
       <div class="bg-white rounded-lg shadow-sm border overflow-hidden">
         <div class="px-6 py-4 border-b border-gray-200">
@@ -52,6 +74,12 @@
                   Email
                 </th>
                 <th
+                  class="w-40 px-4 py-2 text-left text-xs font-medium text-blue-500 uppercase tracking-wider"
+                >
+                  Phone
+                </th>
+
+                <th
                   class="w-32 px-4 py-2 text-left text-xs font-medium text-blue-500 uppercase tracking-wider"
                 >
                   Code
@@ -71,7 +99,7 @@
             </thead>
             <tbody class="bg-white divide-y divide-gray-200">
               <tr
-                v-for="(user, index) in users"
+                v-for="(user, index) in filteredUsers"
                 :key="user.id"
                 class="hover:bg-gray-50 transition-colors duration-150"
               >
@@ -98,6 +126,9 @@
                   <div class="text-sm text-gray-500">
                     {{ isVerified(user) ? 'Verified' : 'Unverified' }}
                   </div>
+                </td>
+                <td class="px-4 py-3 text-sm text-gray-900">
+                  {{ user.phone || 'N/A' }}
                 </td>
                 <td class="px-4 py-3 break-words max-w-[8rem]">
                   <span
@@ -146,8 +177,9 @@
           </table>
         </div>
 
+        
         <!-- Empty State -->
-        <div v-if="users.length === 0" class="text-center py-12">
+        <div v-if="filteredUsers.length === 0" class="text-center py-12">
           <svg
             class="mx-auto h-12 w-12 text-gray-400"
             fill="none"
@@ -225,6 +257,41 @@ const regularUsers = computed(() => {
           !role.name.toLowerCase().includes('super-admin'),
       ),
   ).length
+})
+
+const filters = ref({
+  role: '',
+  search: '',
+})
+
+const filteredUsers = computed(() => {
+  return users.value.filter((user) => {
+    const role = filters.value.role
+    const search = filters.value.search.toLowerCase()
+
+    const hasRole = (name) =>
+      user.roles && user.roles.some((r) => r.name.toLowerCase().includes(name))
+
+    const matchRole =
+      !role ||
+      (role === 'super-admin' && hasRole('super-admin')) ||
+      (role === 'admin' && hasRole('admin') && !hasRole('super-admin')) ||
+      (role === 'user' &&
+        (!user.roles ||
+          user.roles.length === 0 ||
+          user.roles.every(
+            (r) =>
+              !r.name.toLowerCase().includes('admin') &&
+              !r.name.toLowerCase().includes('super-admin'),
+          )))
+
+    const matchSearch =
+      !search ||
+      (user.name && user.name.toLowerCase().includes(search)) ||
+      (user.email && user.email.toLowerCase().includes(search))
+
+    return matchRole && matchSearch
+  })
 })
 
 const getUsers = async () => {

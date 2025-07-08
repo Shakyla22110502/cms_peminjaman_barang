@@ -13,18 +13,42 @@
             class="inline-flex items-center px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-lg shadow-sm transition-colors duration-200"
           >
             <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
             </svg>
             Tambah Peminjaman Ruangan
           </router-link>
         </div>
       </div>
 
-      <div class="bg-white rounded-lg shadow-sm border overflow-hidden">
-        <div class="px-6 py-4 border-b border-gray-200">
-          <h3 class="text-lg font-semibold text-gray-900">Daftar Peminjaman Ruangan</h3>
+      <!-- Filter -->
+      <div class="bg-white rounded-lg shadow-sm border mb-6">
+        <div class="px-6 py-4 border-b border-gray-200 bg-gray-50 flex flex-col sm:flex-row gap-4 sm:items-end">
+          <div class="w-full sm:w-1/3">
+            <label class="block text-sm font-medium text-gray-700 mb-1">Cari Nama Peminjam</label>
+            <input
+              type="text"
+              v-model="filters.name"
+              class="w-full border border-gray-300 rounded-lg shadow-sm px-4 py-2 focus:ring-blue-500 focus:border-blue-500"
+              placeholder="Nama Peminjam"
+            />
+          </div>
+          <div class="w-full sm:w-1/3">
+            <label class="block text-sm font-medium text-gray-700 mb-1">Status</label>
+            <select
+              v-model="filters.status"
+              class="w-full border border-gray-300 rounded-lg shadow-sm px-4 py-2 focus:ring-blue-500 focus:border-blue-500"
+            >
+              <option value="">Semua</option>
+              <option value="pending">Menunggu</option>
+              <option value="approved">Disetujui</option>
+              <option value="rejected">Ditolak</option>
+              <option value="cancelled">Dibatalkan</option>
+            </select>
+          </div>
         </div>
+      </div>
 
+      <div class="bg-white rounded-lg shadow-sm border overflow-hidden">
         <div v-if="loading" class="p-6 text-gray-600">Memuat data...</div>
         <div v-else-if="error" class="p-6 text-red-600">{{ error }}</div>
 
@@ -41,30 +65,29 @@
               </tr>
             </thead>
             <tbody class="bg-white divide-y divide-gray-200">
-              <tr v-for="loan in loans" :key="loan.id" class="hover:bg-gray-50 transition-colors duration-150">
-                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{{ loan.room?.name || '-' }}</td>
-                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{{ loan.borrower_name }}</td>
-                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{{ loan.borrower_contact || '-' }}</td>
-                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                  {{ formatDateTime(loan.start_time) }}<br>
-                  <span class="text-gray-400">s/d</span><br>
+              <tr v-for="loan in filteredLoans" :key="loan.id" class="hover:bg-gray-50 transition-colors duration-150">
+                <td class="px-6 py-4 text-sm text-gray-900">{{ loan.room?.name || '-' }}</td>
+                <td class="px-6 py-4 text-sm text-gray-900">{{ loan.borrower_name }}</td>
+                <td class="px-6 py-4 text-sm text-gray-900">{{ loan.borrower_contact || '-' }}</td>
+                <td class="px-6 py-4 text-sm text-gray-900">
+                  {{ formatDateTime(loan.start_time) }}<br />
+                  <span class="text-gray-400">s/d</span><br />
                   {{ formatDateTime(loan.end_time) }}
                 </td>
-                <td class="px-6 py-4 whitespace-nowrap">
+                <td class="px-6 py-4">
                   <span
                     class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium"
-                    :class="loan.status === 'approved'
-                      ? 'bg-green-100 text-green-800'
-                      : loan.status === 'pending'
-                        ? 'bg-yellow-100 text-yellow-800'
-                        : loan.status === 'rejected'
-                          ? 'bg-red-100 text-red-800'
-                          : 'bg-gray-100 text-gray-800'"
+                    :class="{
+                      'bg-green-100 text-green-800': loan.status === 'approved',
+                      'bg-yellow-100 text-yellow-800': loan.status === 'pending',
+                      'bg-red-100 text-red-800': loan.status === 'rejected',
+                      'bg-gray-100 text-gray-800': loan.status === 'cancelled'
+                    }"
                   >
                     {{ statusLabel(loan.status) }}
                   </span>
                 </td>
-                <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                <td class="px-6 py-4 text-right text-sm font-medium">
                   <div class="flex justify-end space-x-3">
                     <router-link
                       v-if="hasPermission('edit-room-loans')"
@@ -106,27 +129,13 @@
           </table>
         </div>
 
-        <div v-if="!loading && loans.length === 0" class="text-center py-12">
+        <div v-if="!loading && filteredLoans.length === 0" class="text-center py-12">
           <svg class="mx-auto h-12 w-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
               d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"/>
           </svg>
-          <h3 class="mt-2 text-sm font-medium text-gray-900">Belum ada peminjaman ruangan</h3>
-          <p class="mt-1 text-sm text-gray-500">
-            Mulai dengan menambahkan peminjaman ruangan pertama Anda.
-          </p>
-          <div class="mt-6">
-            <router-link
-              v-if="hasPermission('create-room-loans')"
-              to="/room-loans/create"
-              class="inline-flex items-center px-4 py-2 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700"
-            >
-              <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
-              </svg>
-              Tambah Peminjaman Ruangan
-            </router-link>
-          </div>
+          <h3 class="mt-2 text-sm font-medium text-gray-900">Tidak ada hasil ditemukan</h3>
+          <p class="mt-1 text-sm text-gray-500">Coba ubah filter atau tambahkan data baru.</p>
         </div>
       </div>
     </div>
@@ -134,7 +143,7 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue'
+import { ref, onMounted, computed } from 'vue'
 import axios from '../services/api'
 import { useUserStore } from '../stores/UserStore'
 
@@ -144,6 +153,19 @@ const hasPermission = (perm) => userStore.permissions.includes(perm)
 const loans = ref([])
 const loading = ref(true)
 const error = ref(null)
+
+const filters = ref({
+  name: '',
+  status: ''
+})
+
+const filteredLoans = computed(() => {
+  return loans.value.filter((loan) => {
+    const matchName = loan.borrower_name.toLowerCase().includes(filters.value.name.toLowerCase())
+    const matchStatus = filters.value.status ? loan.status === filters.value.status : true
+    return matchName && matchStatus
+  })
+})
 
 const fetchLoans = async () => {
   loading.value = true
@@ -161,7 +183,6 @@ const fetchLoans = async () => {
 
 const formatDateTime = (dt) => {
   if (!dt) return '-'
-  // Format: yyyy-mm-dd hh:mm
   return dt.replace('T', ' ').slice(0, 16)
 }
 

@@ -1,6 +1,8 @@
 <template>
   <div class="max-w-xl mx-auto bg-white p-6 rounded shadow">
-    <h2 class="text-xl font-bold mb-4">{{ isEdit ? 'Edit' : 'Tambah' }} User</h2>
+    <h2 class="text-xl font-bold mb-4">
+      {{ isEdit ? 'Edit' : 'Tambah' }} User
+    </h2>
 
     <form @submit.prevent="handleSubmit">
       <!-- Nama -->
@@ -13,6 +15,22 @@
       <div class="mb-4">
         <label class="block">Email</label>
         <input v-model="form.email" type="email" class="w-full border p-2 rounded" />
+      </div>
+
+      <!-- Phone -->
+      <div class="mb-4">
+        <label class="block mb-1">Nomor Telepon</label>
+        <div class="flex">
+          <span class="inline-flex items-center px-3 rounded-l border border-r-0 border-gray-300 bg-gray-100 text-gray-700 text-sm">
+            +62
+          </span>
+          <input
+            v-model="form.phone_without_prefix"
+            type="tel"
+            class="w-full border border-gray-300 p-2 rounded-r"
+            placeholder="81234567890"
+          />
+        </div>
       </div>
 
       <!-- Password (hanya saat create) -->
@@ -45,17 +63,12 @@
         </select>
       </div>
 
-      
       <!-- Submit + Cancel -->
       <div class="flex gap-2">
         <button type="submit" class="bg-blue-600 text-white px-4 py-2 rounded">
           {{ isEdit ? 'Update' : 'Simpan' }}
         </button>
-        <button
-          type="button"
-          @click="router.back()"
-          class="bg-gray-300 text-gray-800 px-4 py-2 rounded"
-        >
+        <button type="button" @click="router.back()" class="bg-gray-300 text-gray-800 px-4 py-2 rounded">
           Cancel
         </button>
       </div>
@@ -75,10 +88,11 @@ const isEdit = computed(() => !!route.params.id)
 const form = ref({
   name: '',
   email: '',
+  phone_without_prefix: '',
   password: '',
   password_confirmation: '',
   code: '',
-  roles: '', // string sementara, akan diubah jadi array saat submit
+  roles: ''
 })
 
 const allRoles = ref([])
@@ -100,6 +114,13 @@ const getUser = async () => {
     form.value.email = user.email
     form.value.code = user.code
     form.value.roles = user.roles.length > 0 ? user.roles[0].name : ''
+
+    // Pisahkan nomor telepon dari +62
+    if (user.phone && user.phone.startsWith('+62')) {
+      form.value.phone_without_prefix = user.phone.slice(3)
+    } else {
+      form.value.phone_without_prefix = user.phone || ''
+    }
   } catch (e) {
     console.error('Gagal mengambil data user:', e)
   }
@@ -109,23 +130,22 @@ const handleSubmit = async () => {
   const url = isEdit.value ? `/users/${route.params.id}` : '/users'
   const method = isEdit.value ? 'put' : 'post'
 
-  const payload = { ...form.value }
+  const phoneWithoutZero = form.value.phone_without_prefix.replace(/^0+/, '')
+  const payload = {
+    name: form.value.name,
+    email: form.value.email,
+    phone: phoneWithoutZero ? '+62' + phoneWithoutZero : null,
+    code: form.value.code,
+    roles: form.value.roles ? [form.value.roles] : []
+  }
 
-  // Convert role string to array
-  payload.roles = payload.roles ? [payload.roles] : []
-
-  // Hapus password jika kosong saat edit
-  if (isEdit.value && !payload.password) {
-    delete payload.password
-    delete payload.password_confirmation
+  if (!isEdit.value) {
+    payload.password = form.value.password
+    payload.password_confirmation = form.value.password_confirmation
   }
 
   try {
-    await axios({
-      method,
-      url,
-      data: payload,
-    })
+    await axios({ method, url, data: payload })
     router.push('/users')
   } catch (e) {
     console.error('Gagal menyimpan user:', e)
@@ -134,8 +154,6 @@ const handleSubmit = async () => {
 
 onMounted(() => {
   getRoles()
-  if (isEdit.value) {
-    getUser()
-  }
+  if (isEdit.value) getUser()
 })
 </script>

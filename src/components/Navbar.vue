@@ -1,7 +1,7 @@
 <template>
-  <div class="bg-white shadow p-4 flex justify-between items-center">
+  <div class="bg-white shadow p-8 flex justify-between items-center">
     <div class="text-xl font-bold text-gray-800">
-      CMS Peminjaman Barang
+      CMS Peminjaman Barang & Peminjaman Ruangan
     </div>
 
     <div class="flex items-center gap-4">

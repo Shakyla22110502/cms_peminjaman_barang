@@ -24,10 +24,19 @@
 
         <!-- Table -->
         <div class="bg-white rounded-lg shadow-sm border overflow-hidden">
-          <div class="px-6 py-4 border-b border-gray-200">
-            <h3 class="text-lg font-semibold text-gray-900">Daftar Role</h3>
+          <!-- Filter -->
+          <div class="px-6 py-4 border-b border-gray-200 flex flex-col sm:flex-row sm:items-center gap-4">
+            <div class="w-full sm:w-64">
+              <input
+                v-model="search"
+                type="text"
+                placeholder="Cari Nama Role"
+                class="w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+              />
+            </div>
           </div>
 
+          <!-- Table Data -->
           <div class="overflow-x-auto">
             <table class="min-w-full divide-y divide-gray-200">
               <thead class="bg-gray-50">
@@ -39,7 +48,7 @@
                 </tr>
               </thead>
               <tbody class="bg-white divide-y divide-gray-200">
-                <tr v-for="(role, index) in roles" :key="role.id" class="hover:bg-gray-50 transition-colors duration-150">
+                <tr v-for="(role, index) in filteredRoles" :key="role.id" class="hover:bg-gray-50 transition-colors duration-150">
                   <td class="px-6 py-4 text-sm text-gray-900">{{ index + 1 }}</td>
                   <td class="px-6 py-4 font-medium text-gray-900">{{ role.name }}</td>
                   <td class="px-6 py-4">
@@ -71,6 +80,9 @@
                       </button>
                     </div>
                   </td>
+                </tr>
+                <tr v-if="filteredRoles.length === 0">
+                  <td colspan="4" class="text-center py-6 text-gray-500">Tidak ada role ditemukan.</td>
                 </tr>
               </tbody>
             </table>
@@ -120,8 +132,8 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue'
-import axios from '../services/api' // ✅ GUNAKAN custom instance DENGAN token interceptor
+import { ref, onMounted, computed } from 'vue'
+import axios from '../services/api'
 import { useUserStore } from '../stores/UserStore'
 
 const userStore = useUserStore()
@@ -132,10 +144,18 @@ const allPermissions = ref([])
 const showModal = ref(false)
 const editingRole = ref(null)
 const form = ref({ name: '', permissions: [] })
+const search = ref('')
+
+// Filter roles by name
+const filteredRoles = computed(() => {
+  return roles.value.filter(role =>
+    role.name.toLowerCase().includes(search.value.toLowerCase())
+  )
+})
 
 const fetchRoles = async () => {
   try {
-    const res = await axios.get('/roles') // 🔒 pastikan endpoint ini perlu token
+    const res = await axios.get('/roles')
     roles.value = res.data
   } catch (err) {
     console.error('Error fetching roles:', err)

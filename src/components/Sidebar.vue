@@ -1,6 +1,13 @@
 <template>
-  <aside class="h-full p-4">
-    <nav class="space-y-4">
+  <aside class="h-full p-4 bg-blue-800 text-white flex flex-col">
+    <!-- Logo Section -->
+    <div class="mb-6 flex flex-col items-center justify-center px-2">
+      <img src="../assets/inventaris.png" alt="Logo" class="w-30 h-30 object-contain mb-2" />
+      <h1 class="text-2xl font-bold tracking-wide text-center mb-1">Inventaris App</h1>
+      <div class="w-24 h-0.5 bg-white"></div>
+    </div>
+    <!-- Navigation Section -->
+    <nav class="space-y-2 text-sm">
       <RouterLink
         v-if="hasPermission('view dashboard')"
         to="/"
@@ -30,7 +37,7 @@
         to="/borrowings"
         class="block px-4 py-2 rounded hover:bg-blue-700"
       >
-        Manajemen Peminjaman
+        Manajemen Peminjaman Barang
       </RouterLink>
 
       <RouterLink

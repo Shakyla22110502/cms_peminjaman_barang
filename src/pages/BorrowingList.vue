@@ -1,7 +1,7 @@
 <template>
   <div class="min-h-screen bg-gray-50 p-6">
-    <!-- Header -->
     <div class="max-w-7xl mx-auto">
+      <!-- Header -->
       <div class="bg-white rounded-lg shadow-sm border p-6 mb-6">
         <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
           <div>
@@ -14,12 +14,7 @@
             class="inline-flex items-center px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-lg shadow-sm transition-colors duration-200"
           >
             <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path
-                stroke-linecap="round"
-                stroke-linejoin="round"
-                stroke-width="2"
-                d="M12 4v16m8-8H4"
-              />
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
             </svg>
             Tambah Peminjaman
           </router-link>
@@ -32,6 +27,25 @@
           <h3 class="text-lg font-semibold text-gray-900">Daftar Peminjaman</h3>
         </div>
 
+        <!-- Filter -->
+        <div class="px-6 pb-4 flex flex-col sm:flex-row sm:items-center gap-4">
+          <input
+            v-model="search"
+            type="text"
+            placeholder="Cari nama peminjam atau barang"
+            class="w-full sm:w-64 px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+          />
+          <select
+            v-model="statusFilter"
+            class="w-full sm:w-48 px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+          >
+            <option value="">Semua Status</option>
+            <option value="borrowed">Dipinjam</option>
+            <option value="returned">Dikembalikan</option>
+          </select>
+        </div>
+
+        <!-- Table Body -->
         <div v-if="loading" class="p-6 text-gray-600">Memuat data...</div>
         <div v-else-if="error" class="p-6 text-red-600">{{ error }}</div>
 
@@ -39,129 +53,50 @@
           <table class="min-w-full divide-y divide-gray-200">
             <thead class="bg-gray-50">
               <tr>
-                <th
-                  class="px-6 py-3 text-left text-xs font-medium text-blue-500 uppercase tracking-wider"
-                >
-                  Peminjam
-                </th>
-                <th
-                  class="px-6 py-3 text-left text-xs font-medium text-blue-500 uppercase tracking-wider"
-                >
-                  Barang
-                </th>
-                <th
-                  class="px-6 py-3 text-left text-xs font-medium text-blue-500 uppercase tracking-wider"
-                >
-                  Tgl Pinjam
-                </th>
-                <th
-                  class="px-6 py-3 text-left text-xs font-medium text-blue-500 uppercase tracking-wider"
-                >
-                  Tgl Kembali
-                </th>
-                <th
-                  class="px-6 py-3 text-left text-xs font-medium text-blue-500 uppercase tracking-wider"
-                >
-                  Status
-                </th>
-                <th
-                  v-if="hasPermission('edit-borrowing')"
-                  class="px-6 py-3 text-right text-xs font-medium text-blue-500 uppercase tracking-wider"
-                >
-                  Aksi
-                </th>
+                <th class="px-6 py-3 text-left text-xs font-medium text-blue-500 uppercase tracking-wider">Peminjam</th>
+                <th class="px-6 py-3 text-left text-xs font-medium text-blue-500 uppercase tracking-wider">Barang</th>
+                <th class="px-6 py-3 text-left text-xs font-medium text-blue-500 uppercase tracking-wider">Tgl Pinjam</th>
+                <th class="px-6 py-3 text-left text-xs font-medium text-blue-500 uppercase tracking-wider">Tgl Kembali</th>
+                <th class="px-6 py-3 text-left text-xs font-medium text-blue-500 uppercase tracking-wider">Status</th>
+                <th v-if="hasPermission('edit-borrowing')" class="px-6 py-3 text-right text-xs font-medium text-blue-500 uppercase tracking-wider">Aksi</th>
               </tr>
             </thead>
             <tbody class="bg-white divide-y divide-gray-200">
               <tr
-                v-for="borrowing in borrowings"
+                v-for="borrowing in filteredBorrowings"
                 :key="borrowing.id"
                 class="hover:bg-gray-50 transition-colors duration-150"
               >
-                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                  {{ borrowing.user?.name || '-' }}
-                </td>
-                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                  {{ borrowing.item?.name || '-' }}
-                </td>
-                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                  {{ formatDate(borrowing.borrow_date) }}
-                </td>
-                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                  {{ formatDate(borrowing.return_date) }}
-                </td>
+                <td class="px-6 py-4 text-sm text-gray-900">{{ borrowing.user?.name || '-' }}</td>
+                <td class="px-6 py-4 text-sm text-gray-900">{{ borrowing.item?.name || '-' }}</td>
+                <td class="px-6 py-4 text-sm text-gray-900">{{ formatDate(borrowing.borrow_date) }}</td>
+                <td class="px-6 py-4 text-sm text-gray-900">{{ formatDate(borrowing.return_date) }}</td>
                 <td class="px-6 py-4 whitespace-nowrap">
-                  <span
-                    class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium"
-                    :class="
-                      borrowing.is_returned
-                        ? 'bg-green-100 text-green-800'
-                        : 'bg-yellow-100 text-yellow-800'
-                    "
-                  >
+                  <span :class="borrowing.is_returned ? 'bg-green-100 text-green-800' : 'bg-yellow-100 text-yellow-800'" class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium">
                     {{ borrowing.is_returned ? 'Dikembalikan' : 'Dipinjam' }}
                   </span>
                 </td>
-                <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                <td class="px-6 py-4 text-right text-sm font-medium">
                   <div class="flex justify-end space-x-3">
                     <router-link
                       v-if="hasPermission('edit-borrowing')"
                       :to="`/borrowings/${borrowing.id}/edit`"
                       class="inline-flex items-center px-3 py-1.5 border border-gray-300 text-xs font-medium rounded-md bg-yellow-100 text-yellow-800 hover:bg-yellow-200 transition"
                     >
-                      <svg
-                        class="w-3 h-3 mr-1"
-                        fill="none"
-                        stroke="currentColor"
-                        viewBox="0 0 24 24"
-                      >
-                        <path
-                          stroke-linecap="round"
-                          stroke-linejoin="round"
-                          stroke-width="2"
-                          d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"
-                        />
-                      </svg>
                       Edit
                     </router-link>
                     <button
                       v-if="!borrowing.is_returned"
                       @click="markReturned(borrowing.id)"
-                      class="inline-flex items-center px-3 py-1.5 border border-green-300 shadow-sm text-xs font-medium rounded-md text-green-700 bg-green-50 hover:bg-green-100"
+                      class="inline-flex items-center px-3 py-1.5 border border-green-300 text-xs font-medium rounded-md text-green-700 bg-green-50 hover:bg-green-100"
                     >
-                      <svg
-                        class="w-3 h-3 mr-1"
-                        fill="none"
-                        stroke="currentColor"
-                        viewBox="0 0 24 24"
-                      >
-                        <path
-                          stroke-linecap="round"
-                          stroke-linejoin="round"
-                          stroke-width="2"
-                          d="M5 13l4 4L19 7"
-                        />
-                      </svg>
                       Kembalikan
                     </button>
                     <button
                       v-if="hasPermission('delete-borrowing')"
                       @click="remove(borrowing.id)"
-                      class="inline-flex items-center px-3 py-1.5 border border-red-300 shadow-sm text-xs font-medium rounded-md text-red-700 bg-red-50 hover:bg-red-100"
+                      class="inline-flex items-center px-3 py-1.5 border border-red-300 text-xs font-medium rounded-md text-red-700 bg-red-50 hover:bg-red-100"
                     >
-                      <svg
-                        class="w-3 h-3 mr-1"
-                        fill="none"
-                        stroke="currentColor"
-                        viewBox="0 0 24 24"
-                      >
-                        <path
-                          stroke-linecap="round"
-                          stroke-linejoin="round"
-                          stroke-width="2"
-                          d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
-                        />
-                      </svg>
                       Hapus
                     </button>
                   </div>
@@ -172,41 +107,12 @@
         </div>
 
         <!-- Empty State -->
-        <div v-if="!loading && borrowings.length === 0" class="text-center py-12">
-          <svg
-            class="mx-auto h-12 w-12 text-gray-400"
-            fill="none"
-            stroke="currentColor"
-            viewBox="0 0 24 24"
-          >
-            <path
-              stroke-linecap="round"
-              stroke-linejoin="round"
-              stroke-width="2"
-              d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"
-            />
+        <div v-if="!loading && filteredBorrowings.length === 0" class="text-center py-12">
+          <svg class="mx-auto h-12 w-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2" />
           </svg>
-          <h3 class="mt-2 text-sm font-medium text-gray-900">Belum ada peminjaman</h3>
-          <p class="mt-1 text-sm text-gray-500">
-            Mulai dengan menambahkan peminjaman pertama Anda.
-          </p>
-          <div class="mt-6">
-            <router-link
-              v-if="hasPermission('create-borrowing')"
-              to="/borrowings/create"
-              class="inline-flex items-center px-4 py-2 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700"
-            >
-              <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                  stroke-width="2"
-                  d="M12 4v16m8-8H4"
-                />
-              </svg>
-              Tambah Peminjaman
-            </router-link>
-          </div>
+          <h3 class="mt-2 text-sm font-medium text-gray-900">Tidak ada peminjaman ditemukan</h3>
+          <p class="mt-1 text-sm text-gray-500">Coba ubah kata kunci atau filter status di atas.</p>
         </div>
       </div>
     </div>
@@ -214,18 +120,19 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue'
+import { ref, computed, onMounted } from 'vue'
 import axios from '../services/api'
 import { useUserStore } from '../stores/UserStore'
 
 const userStore = useUserStore()
 const hasPermission = (perm) => userStore.permissions.includes(perm)
 
-
-
 const borrowings = ref([])
 const loading = ref(true)
 const error = ref(null)
+
+const search = ref('')
+const statusFilter = ref('') // '', 'borrowed', 'returned'
 
 const fetchBorrowings = async () => {
   loading.value = true
@@ -241,24 +148,32 @@ const fetchBorrowings = async () => {
   }
 }
 
+const filteredBorrowings = computed(() => {
+  return borrowings.value.filter((b) => {
+    const keyword = search.value.toLowerCase()
+    const matchKeyword =
+      b.user?.name?.toLowerCase().includes(keyword) ||
+      b.item?.name?.toLowerCase().includes(keyword)
+
+    const matchStatus =
+      statusFilter.value === '' ||
+      (statusFilter.value === 'borrowed' && !b.is_returned) ||
+      (statusFilter.value === 'returned' && b.is_returned)
+
+    return matchKeyword && matchStatus
+  })
+})
+
 const formatDate = (dateStr) => {
   return dateStr ? dateStr.slice(0, 10) : '-'
 }
 
 const markReturned = async (id) => {
   if (!confirm('Tandai sebagai dikembalikan?')) return
-
   try {
-    const res = await axios.get(`/borrowings/${id}`)
-    const borrowing = res.data.data || res.data
-    const payload = {
-      users_id: borrowing.user.id,
-      item_id: borrowing.item.id,
-      borrow_date: borrowing.borrow_date,
-      return_date: borrowing.return_date,
-      is_returned: true,
-    }
-    await axios.put(`/borrowings/${id}`, payload)
+    await axios.put(`/borrowings/${id}`, {
+      is_returned: true
+    })
     await fetchBorrowings()
     alert('Berhasil menandai sebagai dikembalikan!')
   } catch (err) {
@@ -267,11 +182,12 @@ const markReturned = async (id) => {
   }
 }
 
+
 const remove = async (id) => {
   if (!confirm('Yakin ingin menghapus peminjaman ini?')) return
   try {
     await axios.delete(`/borrowings/${id}`)
-    borrowings.value = borrowings.value.filter((b) => b.id !== id)
+    borrowings.value = borrowings.value.filter(b => b.id !== id)
   } catch (err) {
     alert('Gagal menghapus peminjaman.')
     console.error(err)
