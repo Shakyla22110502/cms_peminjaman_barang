@@ -10,6 +10,7 @@
           <p class="text-gray-600 mt-1">Kelola data ruangan yang tersedia</p>
         </div>
         <router-link
+         v-if="hasPermission('create-room')"
           to="/rooms/create"
           class="inline-flex items-center px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-lg shadow-sm transition-colors duration-200"
         >
@@ -30,12 +31,12 @@
         <table class="min-w-full divide-y divide-gray-200">
           <thead class="bg-gray-50">
             <tr>
-              <th class="px-6 py-3 text-left font-semibold text-gray-700">Nama</th>
-              <th class="px-6 py-3 text-left font-semibold text-gray-700">Lokasi</th>
-              <th class="px-6 py-3 text-left font-semibold text-gray-700">Kapasitas</th>
-              <th class="px-6 py-3 text-left font-semibold text-gray-700">Deskripsi</th>
-              <th class="px-6 py-3 text-left font-semibold text-gray-700">Status</th>
-              <th class="px-6 py-3 text-left font-semibold text-gray-700">Aksi</th>
+              <th class="px-6 py-3 text-left text-xs font-medium text-blue-500 uppercase tracking-wider">Nama</th>
+              <th class="px-6 py-3 text-left text-xs font-medium text-blue-500 uppercase tracking-wider">Lokasi</th>
+              <th class="px-6 py-3 text-left text-xs font-medium text-blue-500 uppercase tracking-wider">Kapasitas</th>
+              <th class="px-6 py-3 text-left text-xs font-medium text-blue-500 uppercase tracking-wider">Deskripsi</th>
+              <th class="px-6 py-3 text-left text-xs font-medium text-blue-500 uppercase tracking-wider">Status</th>
+              <th  class="px-6 py-3 text-left text-xs font-medium text-blue-500 uppercase tracking-wider">Aksi</th>
             </tr>
           </thead>
           <tbody class="divide-y divide-gray-200">

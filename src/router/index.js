@@ -15,6 +15,8 @@ import RoomForm from '../pages/RoomForm.vue'
 import RoomList from '../pages/RoomList.vue'
 import RoomLoanList from '../pages/RoomLoanList.vue'
 import RoomLoanForm from '../pages/RoomLoanForm.vue'
+import LocationList from '../pages/LocationList.vue'
+import LocationForm from '../pages/LocationForm.vue'
 
 const routes = [
   {
@@ -143,6 +145,34 @@ const routes = [
         meta: {
           requiresAuth: true,
           requiredPermission: 'edit-room-loans',
+        },
+      },
+      {
+        path: '/locations',
+        name: 'LocationList',
+        component: LocationList,
+        meta: {
+          requiresAuth: true,
+          requiredPermission: 'view-location',
+        },
+      },
+      {
+        path: '/locations/create',
+        name: 'LocationCreate',
+        component: LocationForm,
+        meta: {
+          requiresAuth: true,
+          requiredPermission: 'create-location',
+        },
+      },
+      {
+        path: '/locations/:id/edit',
+        name: 'LocationEdit',
+        component: LocationForm,
+        props: true,
+        meta: {
+          requiresAuth: true,
+          requiredPermission: 'edit-room',
         },
       },
 

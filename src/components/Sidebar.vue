@@ -50,7 +50,7 @@
       </RouterLink>
 
       <RouterLink
-       v-if="hasPermission('manage rooms')"
+        v-if="hasPermission('manage rooms')"
         to="/rooms"
         class="block px-4 py-2 rounded hover:bg-blue-700"
       >
@@ -63,6 +63,14 @@
         class="block px-4 py-2 rounded hover:bg-blue-700"
       >
         Manajemen Peminjaman Ruangan
+      </RouterLink>
+
+      <RouterLink
+        v-if="hasPermission('manage location')"
+        to="/locations"
+        class="block px-4 py-2 rounded hover:bg-blue-700"
+      >
+        Manajemen Location
       </RouterLink>
     </nav>
   </aside>
