@@ -59,6 +59,7 @@
                 <th class="px-6 py-3 text-left text-xs font-medium text-blue-500 uppercase tracking-wider">Ruangan</th>
                 <th class="px-6 py-3 text-left text-xs font-medium text-blue-500 uppercase tracking-wider">Peminjam</th>
                 <th class="px-6 py-3 text-left text-xs font-medium text-blue-500 uppercase tracking-wider">Kontak</th>
+                <th class="px-6 py-3 text-left text-xs font-medium text-blue-500 uppercase tracking-wider">Email</th>
                 <th class="px-6 py-3 text-left text-xs font-medium text-blue-500 uppercase tracking-wider">Waktu</th>
                 <th class="px-6 py-3 text-left text-xs font-medium text-blue-500 uppercase tracking-wider">Status</th>
                 <th v-if="hasPermission('edit-room-loans')" class="px-6 py-3 text-right text-xs font-medium text-blue-500 uppercase tracking-wider">Aksi</th>
@@ -69,6 +70,7 @@
                 <td class="px-6 py-4 text-sm text-gray-900">{{ loan.room?.name || '-' }}</td>
                 <td class="px-6 py-4 text-sm text-gray-900">{{ loan.borrower_name }}</td>
                 <td class="px-6 py-4 text-sm text-gray-900">{{ loan.borrower_contact || '-' }}</td>
+                <td class="px-6 py-4 text-sm text-gray-900">{{ loan.emails }}</td>
                 <td class="px-6 py-4 text-sm text-gray-900">
                   {{ formatDateTime(loan.start_time) }}<br />
                   <span class="text-gray-400">s/d</span><br />
