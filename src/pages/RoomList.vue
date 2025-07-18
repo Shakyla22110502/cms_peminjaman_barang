@@ -10,7 +10,7 @@
           <p class="text-gray-600 mt-1">Kelola data ruangan yang tersedia</p>
         </div>
         <router-link
-          v-if="hasPermission('create-room')"
+          v-if="hasPermission('create-rooms')"
           to="/rooms/create"
           class="inline-flex items-center px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-lg shadow-sm transition-colors duration-200"
         >
@@ -74,7 +74,7 @@
               </td>
               <td class="px-6 py-4">
                 <router-link
-                  v-if="hasPermission('edit-room')"
+                  v-if="hasPermission('edit-rooms')"
                   :to="`/rooms/${room.id}/edit`"
                   class="inline-flex items-center px-3 py-1.5 border border-gray-300 text-xs font-medium rounded-md bg-yellow-100 text-yellow-800 hover:bg-yellow-200 transition"
                 >
@@ -85,7 +85,7 @@
                   Edit
                 </router-link>
                 <button
-                  v-if="hasPermission('delete-room')"
+                  v-if="hasPermission('delete-rooms')"
                   @click="deleteRoom(room.id)"
                   class="inline-flex items-center px-3 py-1.5 border border-red-300 shadow-sm text-xs font-medium rounded-md text-red-700 bg-red-50 hover:bg-red-100"
                 >

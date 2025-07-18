@@ -9,7 +9,7 @@
             <p class="text-gray-600 mt-1">Kelola data pengguna sistem</p>
           </div>
           <router-link
-            v-if="hasPermission('create-users')"
+          v-if="hasPermission('create-users')"
             to="/users/create"
             class="inline-flex items-center px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-lg shadow-sm transition-colors duration-200"
           >
@@ -30,7 +30,10 @@
       <div class="bg-white rounded-lg shadow-sm border p-6 mb-6 grid md:grid-cols-4 gap-4">
         <div>
           <label class="block text-sm font-medium text-gray-700 mb-1">Peran</label>
-          <select v-model="filters.role" class="w-full sm:w-64 px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm">
+          <select
+            v-model="filters.role"
+            class="w-full sm:w-64 px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+          >
             <option value="">Semua</option>
             <option value="super-admin">Super Admin</option>
             <option value="admin">Admin</option>
@@ -84,13 +87,19 @@
                 >
                   Code
                 </th>
+
+                <th
+                  class="w-32 px-4 py-2 text-left text-xs font-medium text-blue-500 uppercase tracking-wider"
+                >
+                  NFC Code
+                </th>
+
                 <th
                   class="w-48 px-4 py-2 text-left text-xs font-medium text-blue-500 uppercase tracking-wider"
                 >
                   Role
                 </th>
                 <th
-                  v-if="hasPermission('edit-users')"
                   class="w-40 px-4 py-2 text-center text-xs font-medium text-blue-500 uppercase tracking-wider"
                 >
                   Aksi
@@ -138,6 +147,14 @@
                   </span>
                 </td>
 
+                <td class="px-4 py-3 break-words max-w-[8rem]">
+                  <span
+                    class="block w-full break-words px-2.5 py-0.5 rounded-md text-xs font-medium bg-gray-100 text-gray-800"
+                  >
+                    {{ user.code_nfc || 'N/A' }}
+                  </span>
+                </td>
+
                 <td class="px-4 py-3">
                   <div class="flex flex-wrap gap-1">
                     <span
@@ -156,15 +173,16 @@
                     </span>
                   </div>
                 </td>
-                <td v-if="hasPermission('edit-users')" class="px-4 py-3 text-center">
+                <td class="px-4 py-3 text-center">
                   <div class="flex justify-center gap-2">
                     <router-link
+                    v-if="hasPermission('edit-users')"
                       :to="`/users/${user.id}/edit`"
                       class="px-3 py-1 text-xs border border-gray-300 rounded-md text-yellow-800 bg-yellow-100 hover:bg-yellow-200"
                       >Edit</router-link
                     >
                     <button
-                      v-if="hasPermission('delete-users')"
+                    v-if="hasPermission('delete-users')"
                       @click="deleteUser(user.id)"
                       class="px-3 py-1 text-xs border border-red-300 rounded-md text-red-600 bg-red-50 hover:bg-red-100"
                     >
@@ -177,7 +195,6 @@
           </table>
         </div>
 
-        
         <!-- Empty State -->
         <div v-if="filteredUsers.length === 0" class="text-center py-12">
           <svg
@@ -231,7 +248,7 @@ const users = ref([])
 const superadminUsers = computed(() => {
   return users.value.filter(
     (user) =>
-      user.roles && user.roles.some((role) => role.name.toLowerCase().includes('super-admin')),
+      user.roles && user.roles.some((role) => role.name.toLowerCase().includes('super admin')),
   ).length
 })
 
@@ -241,7 +258,7 @@ const adminUsers = computed(() => {
     (user) =>
       user.roles &&
       user.roles.some((role) => role.name.toLowerCase().includes('admin')) &&
-      !user.roles.some((role) => role.name.toLowerCase().includes('super-admin')),
+      !user.roles.some((role) => role.name.toLowerCase().includes('super admin')),
   ).length
 })
 
@@ -254,7 +271,7 @@ const regularUsers = computed(() => {
       user.roles.every(
         (role) =>
           !role.name.toLowerCase().includes('admin') &&
-          !role.name.toLowerCase().includes('super-admin'),
+          !role.name.toLowerCase().includes('super admin'),
       ),
   ).length
 })
@@ -275,14 +292,14 @@ const filteredUsers = computed(() => {
     const matchRole =
       !role ||
       (role === 'super-admin' && hasRole('super-admin')) ||
-      (role === 'admin' && hasRole('admin') && !hasRole('super-admin')) ||
+      (role === 'admin' && hasRole('admin') && !hasRole('superadmin')) ||
       (role === 'user' &&
         (!user.roles ||
           user.roles.length === 0 ||
           user.roles.every(
             (r) =>
               !r.name.toLowerCase().includes('admin') &&
-              !r.name.toLowerCase().includes('super-admin'),
+              !r.name.toLowerCase().includes('super admin'),
           )))
 
     const matchSearch =

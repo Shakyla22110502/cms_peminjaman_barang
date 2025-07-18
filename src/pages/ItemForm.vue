@@ -29,7 +29,15 @@
         </select>
       </div>
 
-       <!-- Submit + Cancel -->
+      <div class="mb-6">
+        <label class="block font-medium mb-1 text-gray-700">Perlu Persetujuan Admin?</label>
+        <select v-model="form.is_approval" class="w-full border-gray-300 rounded-lg shadow-sm focus:ring-yellow-500 focus:border-yellow-500 px-4 py-2">
+          <option :value="true">Ya</option>
+          <option :value="false">Tidak</option>
+        </select>
+      </div>
+
+      <!-- Submit + Cancel -->
       <div class="flex gap-2">
         <button type="submit" class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition">
           {{ isEdit ? 'Update' : 'Simpan' }}
@@ -59,7 +67,8 @@ const form = ref({
   name: '',
   serial_code: '',
   is_available: true,
-  is_active: true
+  is_active: true,
+  is_approval: false, // ✅ Default: Tidak perlu persetujuan
 })
 
 const getItem = async () => {

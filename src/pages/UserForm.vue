@@ -1,8 +1,6 @@
 <template>
   <div class="max-w-xl mx-auto bg-white p-6 rounded shadow">
-    <h2 class="text-xl font-bold mb-4">
-      {{ isEdit ? 'Edit' : 'Tambah' }} User
-    </h2>
+    <h2 class="text-xl font-bold mb-4">{{ isEdit ? 'Edit' : 'Tambah' }} User</h2>
 
     <form @submit.prevent="handleSubmit">
       <!-- Nama -->
@@ -21,7 +19,9 @@
       <div class="mb-4">
         <label class="block mb-1">Nomor Telepon</label>
         <div class="flex">
-          <span class="inline-flex items-center px-3 rounded-l border border-r-0 border-gray-300 bg-gray-100 text-gray-700 text-sm">
+          <span
+            class="inline-flex items-center px-3 rounded-l border border-r-0 border-gray-300 bg-gray-100 text-gray-700 text-sm"
+          >
             +62
           </span>
           <input
@@ -54,6 +54,12 @@
         <input v-model="form.code" type="text" class="w-full border p-2 rounded" />
       </div>
 
+      <!-- Code NFC -->
+      <div class="mb-4">
+        <label class="block">Code NFC</label>
+        <input v-model="form.code_nfc" type="text" class="w-full border p-2 rounded" />
+      </div>
+
       <!-- Role -->
       <div class="mb-4">
         <label class="block">Role</label>
@@ -68,7 +74,11 @@
         <button type="submit" class="bg-blue-600 text-white px-4 py-2 rounded">
           {{ isEdit ? 'Update' : 'Simpan' }}
         </button>
-        <button type="button" @click="router.back()" class="bg-gray-300 text-gray-800 px-4 py-2 rounded">
+        <button
+          type="button"
+          @click="router.back()"
+          class="bg-gray-300 text-gray-800 px-4 py-2 rounded"
+        >
           Cancel
         </button>
       </div>
@@ -92,7 +102,8 @@ const form = ref({
   password: '',
   password_confirmation: '',
   code: '',
-  roles: ''
+  code_nfc: '',
+  roles: '',
 })
 
 const allRoles = ref([])
@@ -113,6 +124,7 @@ const getUser = async () => {
     form.value.name = user.name
     form.value.email = user.email
     form.value.code = user.code
+    form.value.code_nfc = user.code_nfc || ''
     form.value.roles = user.roles.length > 0 ? user.roles[0].name : ''
 
     // Pisahkan nomor telepon dari +62
@@ -136,7 +148,8 @@ const handleSubmit = async () => {
     email: form.value.email,
     phone: phoneWithoutZero ? '+62' + phoneWithoutZero : null,
     code: form.value.code,
-    roles: form.value.roles ? [form.value.roles] : []
+    code_nfc: form.value.code_nfc,
+    roles: form.value.roles ? [form.value.roles] : [],
   }
 
   if (!isEdit.value) {

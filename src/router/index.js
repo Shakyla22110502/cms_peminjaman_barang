@@ -17,6 +17,8 @@ import RoomLoanList from '../pages/RoomLoanList.vue'
 import RoomLoanForm from '../pages/RoomLoanForm.vue'
 import LocationList from '../pages/LocationList.vue'
 import LocationForm from '../pages/LocationForm.vue'
+import WeeklyRoomLoanList from '../pages/WeeklyRoomLoanList.vue'
+import WeeklyRoomLoanForm from '../pages/WeeklyRoomLoanForm.vue'
 
 const routes = [
   {
@@ -95,7 +97,7 @@ const routes = [
         component: RoomList,
         meta: {
           requiresAuth: true,
-          requiredPermission: 'view-room',
+          requiredPermission: 'view-rooms',
         },
       },
       {
@@ -104,7 +106,7 @@ const routes = [
         component: RoomForm,
         meta: {
           requiresAuth: true,
-          requiredPermission: 'create-room',
+          requiredPermission: 'create-rooms',
         },
       },
       {
@@ -114,7 +116,7 @@ const routes = [
         props: true,
         meta: {
           requiresAuth: true,
-          requiredPermission: 'edit-room',
+          requiredPermission: 'edit-rooms',
         },
       },
 
@@ -146,6 +148,25 @@ const routes = [
           requiresAuth: true,
           requiredPermission: 'edit-room-loans',
         },
+      },
+      {
+        path: '/weekly-room-loans',
+        name: 'WeeklyRoomLoanList',
+        component: WeeklyRoomLoanList,
+        meta: { requiresAuth: true },
+      },
+      {
+        path: '/weekly-room-loans/create',
+        name: 'WeeklyRoomLoanCreate',
+        component: WeeklyRoomLoanForm,
+        meta: { requiresAuth: true},
+      },
+      {
+        path: '/weekly-room-loans/:id/edit',
+        name: 'WeeklyRoomLoanEdit',
+        component: WeeklyRoomLoanForm,
+        props: true,
+        meta: { requiresAuth: true},
       },
       {
         path: '/locations',

@@ -31,13 +31,21 @@
         </div>
         <div>
           <label class="block text-sm font-medium text-gray-700 mb-1">Status Aktif</label>
-          <select v-model="filters.active" class="w-fulw-full sm:w-64 px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm">
+          <select v-model="filters.active" class="w-full sm:w-64 px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm">
             <option value="">Semua</option>
             <option value="active">Aktif</option>
             <option value="inactive">Tidak Aktif</option>
           </select>
         </div>
-        <div class="md:col-span-2">
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-1">Perlu Persetujuan</label>
+          <select v-model="filters.approval" class="w-full sm:w-64 px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm">
+            <option value="">Semua</option>
+            <option value="yes">Ya</option>
+            <option value="no">Tidak</option>
+          </select>
+        </div>
+        <div class="md:col-span-1">
           <label class="block text-sm font-medium text-gray-700 mb-1">Cari Nama / Kode Serial</label>
           <input
             v-model="filters.search"
@@ -58,12 +66,13 @@
           <table v-if="filteredItems.length" class="min-w-full divide-y divide-gray-200">
             <thead class="bg-gray-50">
               <tr>
-                <th class="px-6 py-3 text-left text-xs font-medium text-blue-500 uppercase">ID</th>
+                <th class="px-6 py-3 text-left text-xs font-medium text-blue-500 uppercase">#</th>
                 <th class="px-6 py-3 text-left text-xs font-medium text-blue-500 uppercase">Nama</th>
                 <th class="px-6 py-3 text-left text-xs font-medium text-blue-500 uppercase">Serial</th>
                 <th class="px-6 py-3 text-left text-xs font-medium text-blue-500 uppercase">Status</th>
                 <th class="px-6 py-3 text-left text-xs font-medium text-blue-500 uppercase">Aktif</th>
-                <th class="px-6 py-3 text-right text-xs font-medium text-blue-500 uppercase" v-if="hasPermission('edit-items')">Aksi</th>
+                <th class="px-6 py-3 text-left text-xs font-medium text-blue-500 uppercase">Persetujuan</th>
+                <th v-if="hasPermission('edit-items')" class="px-6 py-3 text-right text-xs font-medium text-blue-500 uppercase">Aksi</th>
               </tr>
             </thead>
             <tbody class="bg-white divide-y divide-gray-200">
@@ -82,6 +91,11 @@
                 <td class="px-6 py-4">
                   <span :class="item.is_active ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'" class="px-2.5 py-0.5 rounded-full text-xs font-medium">
                     {{ item.is_active ? 'Aktif' : 'Tidak Aktif' }}
+                  </span>
+                </td>
+                <td class="px-6 py-4">
+                  <span :class="item.is_approval ? 'bg-yellow-100 text-yellow-800' : 'bg-gray-100 text-gray-600'" class="px-2.5 py-0.5 rounded-full text-xs font-medium">
+                    {{ item.is_approval ? 'Ya' : 'Tidak' }}
                   </span>
                 </td>
                 <td v-if="hasPermission('edit-items')" class="px-6 py-4 text-right">
@@ -126,6 +140,7 @@ const items = ref([])
 const filters = ref({
   availability: '',
   active: '',
+  approval: '',
   search: '',
 })
 
@@ -164,20 +179,19 @@ const filteredItems = computed(() => {
       (filters.value.active === 'active' && item.is_active) ||
       (filters.value.active === 'inactive' && !item.is_active)
 
+    const matchApproval =
+      !filters.value.approval ||
+      (filters.value.approval === 'yes' && item.is_approval) ||
+      (filters.value.approval === 'no' && !item.is_approval)
+
     const search = filters.value.search.toLowerCase()
     const matchSearch =
       (item.name?.toLowerCase() ?? '').includes(search) ||
       (item.serial_code?.toLowerCase() ?? '').includes(search)
 
-    return matchAvailability && matchActive && matchSearch
+    return matchAvailability && matchActive && matchApproval && matchSearch
   })
 })
-
-// Optional debugging
-watch(filters, () => {
-  console.log('Filter berubah:', filters.value)
-  console.log('Hasil filter:', filteredItems.value)
-}, { deep: true })
 
 onMounted(() => {
   getItems()

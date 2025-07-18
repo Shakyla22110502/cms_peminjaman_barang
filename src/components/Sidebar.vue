@@ -9,7 +9,7 @@
     <!-- Navigation Section -->
     <nav class="space-y-2 text-sm">
       <RouterLink
-        v-if="hasPermission('view dashboard')"
+        v-if="hasPermission('view-dashboard')"
         to="/"
         class="block px-4 py-2 rounded hover:bg-blue-700"
       >
@@ -70,6 +70,14 @@
         class="block px-4 py-2 rounded hover:bg-blue-700"
       >
         Manajemen Peminjaman Ruangan
+      </RouterLink>
+
+      <RouterLink
+        v-if="hasPermission('manage weekly-room-loan')"
+        to="/weekly-room-loans"
+        class="block px-4 py-2 rounded hover:bg-blue-700"
+      >
+        Manajemen Peminjaman Ruangan Mingguan
       </RouterLink>
 
       <RouterLink
