@@ -167,17 +167,17 @@ const getRooms = async () => {
 }
 
 const getLoan = async (id) => {
-  const res = await axios.get(`/api/weekly-room-loans/${id}`)
+  const res = await axios.get(`/weekly-room-loans/${id}`)
   form.value = { ...res.data }
 }
 
 const submitForm = async () => {
   try {
     if (isEdit.value) {
-      await axios.put(`/api/weekly-room-loans/${route.params.id}`, form.value)
+      await axios.put(`/weekly-room-loans/${route.params.id}`, form.value)
       alert('Peminjaman berhasil diperbarui!')
     } else {
-      await axios.post('/api/weekly-room-loans', form.value)
+      await axios.post('/weekly-room-loans', form.value)
       alert('Peminjaman berhasil ditambahkan!')
     }
     router.push('/weekly-room-loans')
