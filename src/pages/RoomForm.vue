@@ -90,8 +90,8 @@ onMounted(async () => {
   if (roomId) {
     const res = await axios.get(`/rooms/${roomId}`)
     form.value = {
-      ...res.data,
-      is_active: !!res.data.is_active
+      ...res.data.data,
+      is_active: !!res.data.data.is_active
     }
   }
 })

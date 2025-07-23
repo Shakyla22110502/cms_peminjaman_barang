@@ -9,11 +9,10 @@ export const useUserStore = defineStore('user', {
   }),
   actions: {
     setUser(userData) {
-      this.user = userData.user
+      this.user = userData.user // bukan users
       this.token = userData.token
       this.permissions = userData.permissions
 
-      // Simpan ke localStorage
       localStorage.setItem('user', JSON.stringify(userData.user))
       localStorage.setItem('token', userData.token)
       localStorage.setItem('userPermissions', JSON.stringify(userData.permissions))
