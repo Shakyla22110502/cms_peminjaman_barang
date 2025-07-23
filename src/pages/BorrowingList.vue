@@ -128,21 +128,21 @@
                 <td class="px-6 py-4 text-right">
                   <div class="flex justify-end space-x-2">
                     <!-- Approve -->
-                    <button
+                    <!-- <button
                       v-if="borrowing.approval_status === 'pending'"
                       @click="approveBorrowing(borrowing.id)"
                       class="px-3 py-1 border border-green-300 text-xs rounded-md text-green-700 bg-green-50 hover:bg-green-100"
                     >
                       Setujui
                     </button>
-                    <!-- Reject -->
+                    Reject
                     <button
                       v-if="borrowing.approval_status === 'pending'"
                       @click="rejectBorrowing(borrowing.id)"
                       class="px-3 py-1 border border-red-300 text-xs rounded-md text-red-700 bg-red-50 hover:bg-red-100"
                     >
                       Tolak
-                    </button>
+                    </button> -->
                     <!-- Edit -->
                     <router-link
                       v-if="hasPermission('edit-borrowing')"
@@ -260,29 +260,29 @@ const filteredBorrowings = computed(() => {
 
 const formatDate = (dateStr) => (dateStr ? dateStr.slice(0, 10) : "-")
 
-const approveBorrowing = async (id) => {
-  if (!confirm("Setujui peminjaman ini?")) return
-  try {
-    await axios.put(`/borrowings/${id}`, { approval_status: "approved" })
-    await fetchBorrowings()
-    alert("Peminjaman disetujui!")
-  } catch (err) {
-    console.error(err)
-    alert("Gagal menyetujui peminjaman.")
-  }
-}
+//const approveBorrowing = async (id) => {
+//  if (!confirm("Setujui peminjaman ini?")) return
+//  try {
+//    await axios.put(`/borrowings/${id}`, { approval_status: "approved" })
+//    await fetchBorrowings()
+//    alert("Peminjaman disetujui!")
+//  } catch (err) {
+//    console.error(err)
+//    alert("Gagal menyetujui peminjaman.")
+//  }
+//}
 
-const rejectBorrowing = async (id) => {
-  if (!confirm("Tolak peminjaman ini?")) return
-  try {
-    await axios.put(`/borrowings/${id}`, { approval_status: "rejected" })
-    await fetchBorrowings()
-    alert("Peminjaman ditolak!")
-  } catch (err) {
-    console.error(err)
-    alert("Gagal menolak peminjaman.")
-  }
-}
+// const rejectBorrowing = async (id) => {
+//   if (!confirm("Tolak peminjaman ini?")) return
+//   try {
+//     await axios.put(`/borrowings/${id}`, { approval_status: "rejected" })
+//     await fetchBorrowings()
+//     alert("Peminjaman ditolak!")
+//   } catch (err) {
+//     console.error(err)
+//     alert("Gagal menolak peminjaman.")
+//   }
+// }
 
 const markReturned = async (id) => {
   if (!confirm("Tandai peminjaman sebagai sudah dikembalikan?")) return

@@ -8,7 +8,11 @@
       <!-- Ruangan -->
       <div class="mb-4">
         <label class="block font-medium mb-1 text-gray-700">Ruangan</label>
-        <select v-model="form.room_id" class="w-full border-gray-300 rounded-lg shadow-sm focus:ring-blue-500 focus:border-blue-500 px-4 py-2" required>
+        <select
+          v-model="form.room_id"
+          class="w-full border-gray-300 rounded-lg shadow-sm focus:ring-blue-500 focus:border-blue-500 px-4 py-2"
+          required
+        >
           <option disabled value="">Pilih Ruangan</option>
           <option v-for="room in rooms" :key="room.id" :value="room.id">
             {{ room.name }} ({{ room.location }})
@@ -70,7 +74,9 @@
 
       <!-- Email Notifikasi (opsional) -->
       <div class="mb-4">
-        <label class="block font-medium mb-1 text-gray-700">Email Notifikasi (opsional, pisahkan dengan koma)</label>
+        <label class="block font-medium mb-1 text-gray-700"
+          >Email Notifikasi (opsional, pisahkan dengan koma)</label
+        >
         <input
           v-model="form.emails"
           type="text"
@@ -81,7 +87,10 @@
       <!-- Status (hanya edit) -->
       <div class="mb-4" v-if="isEdit">
         <label class="block font-medium mb-1 text-gray-700">Status</label>
-        <select v-model="form.status" class="w-full border-gray-300 rounded-lg shadow-sm focus:ring-blue-500 focus:border-blue-500 px-4 py-2">
+        <select
+          v-model="form.status"
+          class="w-full border-gray-300 rounded-lg shadow-sm focus:ring-blue-500 focus:border-blue-500 px-4 py-2"
+        >
           <option value="pending">Menunggu</option>
           <option value="approved">Disetujui</option>
           <option value="rejected">Ditolak</option>
@@ -91,10 +100,17 @@
 
       <!-- Tombol Aksi -->
       <div class="flex gap-2">
-        <button type="submit" class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition">
+        <button
+          type="submit"
+          class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition"
+        >
           Simpan
         </button>
-        <button type="button" @click="router.push('/room-loans')" class="px-4 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 transition">
+        <button
+          type="button"
+          @click="router.push('/room-loans')"
+          class="px-4 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 transition"
+        >
           Batal
         </button>
       </div>
@@ -120,7 +136,7 @@ const form = ref({
   start_time: '',
   end_time: '',
   emails: '',
-  status: 'pending'
+  status: 'pending',
 })
 
 const rooms = ref([])
@@ -129,7 +145,7 @@ const loadData = async () => {
   try {
     // Ambil semua ruangan
     const roomRes = await axios.get('/rooms')
-    rooms.value = roomRes.data
+    rooms.value = roomRes.data.data
 
     // Jika edit, ambil data room loan
     if (isEdit.value) {
@@ -143,8 +159,8 @@ const loadData = async () => {
         purpose: loan.purpose ?? '',
         start_time: loan.start_time ? loan.start_time.slice(0, 16) : '',
         end_time: loan.end_time ? loan.end_time.slice(0, 16) : '',
-        emails: loan.emails ?? '',
-        status: loan.status ?? 'pending'
+        emails: Array.isArray(loan.emails) ? loan.emails.join(', ') : (loan.emails ?? ''),
+        status: loan.status ?? 'pending',
       }
     }
   } catch (err) {
@@ -154,11 +170,23 @@ const loadData = async () => {
 
 const submit = async () => {
   try {
-    if (isEdit.value) {
-      await axios.put(`/room-loans/${route.params.id}`, form.value)
+    // Pastikan emails berbentuk array sebelum dikirim
+    let payload = { ...form.value }
+    if (typeof payload.emails === 'string' && payload.emails.trim() !== '') {
+      payload.emails = payload.emails
+        .split(',')
+        .map((email) => email.trim())
+        .filter((email) => email !== '')
     } else {
-      await axios.post('/room-loans', form.value)
+      payload.emails = [] // jika kosong, kirim array kosong
     }
+
+    if (isEdit.value) {
+      await axios.put(`/room-loans/${route.params.id}`, payload)
+    } else {
+      await axios.post('/room-loans', payload)
+    }
+
     router.push('/room-loans')
   } catch (err) {
     alert('Gagal menyimpan data.')
