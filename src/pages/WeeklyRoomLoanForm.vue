@@ -50,6 +50,18 @@
           />
         </div>
 
+        <!-- Email -->
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-1">Email</label>
+          <input
+            type="text"
+            v-model="form.emails"
+            required
+            placeholder="Email"
+            class="w-full border border-gray-300 rounded-lg px-4 py-2 focus:ring-blue-500 focus:border-blue-500"
+          />
+        </div>
+
         <!-- Tujuan -->
         <div>
           <label class="block text-sm font-medium text-gray-700 mb-1">Tujuan</label>
@@ -154,11 +166,12 @@ const form = ref({
   borrower_name: '',
   borrower_contact: '',
   purpose: '',
+  emails: '',
   day_of_week: '',
   start_time: '',
   end_time: '',
   start_date: '',
-  end_date: ''
+  end_date: '',
 })
 
 const getRooms = async () => {
@@ -173,13 +186,19 @@ const getLoan = async (id) => {
 
 const submitForm = async () => {
   try {
+    const payload = {
+      ...form.value,
+      emails: form.value.emails ? [form.value.emails] : [],
+    }
+
     if (isEdit.value) {
-      await axios.put(`/weekly-room-loans/${route.params.id}`, form.value)
+      await axios.put(`/weekly-room-loans/${route.params.id}`, payload)
       alert('Peminjaman berhasil diperbarui!')
     } else {
-      await axios.post('/weekly-room-loans', form.value)
+      await axios.post('/weekly-room-loans', payload)
       alert('Peminjaman berhasil ditambahkan!')
     }
+
     router.push('/weekly-room-loans')
   } catch (error) {
     alert('Gagal menyimpan data.')

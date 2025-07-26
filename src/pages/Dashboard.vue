@@ -100,7 +100,7 @@ const loadDashboardData = async () => {
     availableItems.value = itemsRes.data.data.filter(i => i.is_available).length
     totalRoles.value = rolesRes.data.length
     totalPermissions.value = permissionsRes.data.length
-    totalRooms.value = roomsRes.data.length
+    totalRooms.value = roomsRes.data.data.length
     totalRoomsLoan.value = roomsloanRes.data.length
   } catch (error) {
     console.error('Gagal memuat data dashboard:', error)
