@@ -72,7 +72,7 @@
                   {{ room.is_active ? 'Aktif' : 'Nonaktif' }}
                 </span>
               </td>
-              <td class="px-6 py-4">
+              <td class="px-6 py-4 space-x-3">
                 <router-link
                   v-if="hasPermission('edit-rooms')"
                   :to="`/rooms/${room.id}/edit`"

@@ -12,7 +12,9 @@
   },
   "dependencies": {
     "@tailwindcss/vite": "^4.1.10",
+    "lucide-vue-next": "^0.534.0",
     "pinia": "^3.0.3",
+    "sweetalert2": "^11.22.2",
     "tailwindcss": "^4.1.10",
     "vue": "^3.5.13",
     "vue-router": "^4.5.0"

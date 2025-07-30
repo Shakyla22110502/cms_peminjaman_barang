@@ -73,7 +73,7 @@
       </RouterLink>
 
       <RouterLink
-        v-if="hasPermission('manage weekly-room-loan')"
+        v-if="hasPermission('manage weekly-room-loans')"
         to="/weekly-room-loans"
         class="block px-4 py-2 rounded hover:bg-blue-700"
       >

@@ -1,5 +1,4 @@
 <template>
-  <DefaultLayout>
     <div class="min-h-screen bg-gray-50 p-6">
       <div class="max-w-7xl mx-auto">
         <!-- Header -->
@@ -72,7 +71,6 @@
         <!-- Bisa tambahkan bagian log aktivitas atau daftar item populer di bawah sini -->
       </div>
     </div>
-  </DefaultLayout>
 </template>
 
 <script setup>

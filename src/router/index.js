@@ -43,6 +43,7 @@ const routes = [
       // Items
       {
         path: 'items',
+        name: 'ItemList',
         component: ItemList,
         meta: { requiresAuth: true, requiredPermission: 'view-items' },
       },
@@ -153,20 +154,32 @@ const routes = [
         path: '/weekly-room-loans',
         name: 'WeeklyRoomLoanList',
         component: WeeklyRoomLoanList,
-        meta: { requiresAuth: true },
+        props: true,
+        meta: { 
+          requiresAuth: true,
+          requiredPermission: 'view-weekly-room-loans',
+        },
       },
       {
         path: '/weekly-room-loans/create',
         name: 'WeeklyRoomLoanCreate',
         component: WeeklyRoomLoanForm,
-        meta: { requiresAuth: true},
+        meta: { 
+          props: true,
+          requiresAuth: true,
+          requiredPermission: 'create-weekly-room-loans',
+        },
       },
       {
         path: '/weekly-room-loans/:id/edit',
         name: 'WeeklyRoomLoanEdit',
         component: WeeklyRoomLoanForm,
         props: true,
-        meta: { requiresAuth: true},
+        meta: { 
+          props: true,
+          requiresAuth: true, 
+          requiredPermission: 'edit-weekly-room-loans',
+        },
       },
       {
         path: '/locations',
@@ -193,7 +206,7 @@ const routes = [
         props: true,
         meta: {
           requiresAuth: true,
-          requiredPermission: 'edit-room',
+          requiredPermission: 'edit-location',
         },
       },
 
@@ -210,6 +223,16 @@ const routes = [
     name: 'Login',
     component: Login,
   },
+  {
+    path: '/forgot-password',
+    name: 'ForgotPassword',
+    component: () => import('../pages/ForgotPassword.vue'),
+  },
+  {
+    path: '/reset-password',
+    name: 'ResetPassword',
+    component: () => import('../pages/ResetPassword.vue'),
+  },
 ]
 
 const router = createRouter({
@@ -219,8 +242,9 @@ const router = createRouter({
 
 router.beforeEach((to, from, next) => {
   const token = localStorage.getItem('token')
+  const guestRoutes = ['Login', 'ForgotPassword', 'ResetPassword']
 
-  if (to.name !== 'Login' && !token) {
+  if (!guestRoutes.includes(to.name) && !token) {
     return next({ name: 'Login' })
   }
 

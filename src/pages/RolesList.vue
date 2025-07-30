@@ -1,5 +1,4 @@
 <template>
-  <DefaultLayout>
     <div class="min-h-screen bg-gray-50 p-6">
       <div class="max-w-7xl mx-auto">
         <!-- Header -->
@@ -128,13 +127,13 @@
         </div>
       </div>
     </div>
-  </DefaultLayout>
 </template>
 
 <script setup>
 import { ref, onMounted, computed } from 'vue'
 import axios from '../services/api'
 import { useUserStore } from '../stores/UserStore'
+
 
 const userStore = useUserStore()
 const hasPermission = (perm) => userStore.permissions.includes(perm)

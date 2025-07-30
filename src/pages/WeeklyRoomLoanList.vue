@@ -9,6 +9,7 @@
             <p class="text-gray-600 mt-1">Kelola jadwal peminjaman mingguan</p>
           </div>
           <router-link
+            v-if="hasPermission('create-weekly-room-loans')"
             to="/weekly-room-loans/create"
             class="inline-flex items-center px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-lg shadow-sm transition-colors duration-200"
           >
@@ -63,7 +64,7 @@
                 <th class="px-6 py-3 text-left text-xs font-medium text-blue-500 uppercase tracking-wider">Waktu</th>
                 <th class="px-6 py-3 text-left text-xs font-medium text-blue-500 uppercase tracking-wider">Periode</th>
                 <th class="px-6 py-3 text-left text-xs font-medium text-blue-500 uppercase tracking-wider">Status</th>
-                <th class="px-6 py-3 text-right text-xs font-medium text-blue-500 uppercase tracking-wider">Aksi</th>
+                <th v-if="hasPermission('edit-weekly-room-loans')" class="px-6 py-3 text-right text-xs font-medium text-blue-500 uppercase tracking-wider">Aksi</th>
               </tr>
             </thead>
             <tbody class="bg-white divide-y divide-gray-200">
@@ -97,12 +98,14 @@
                 <td class="px-6 py-4 text-right text-sm font-medium">
                   <div class="flex justify-end space-x-3">
                     <router-link
+                      v-if="hasPermission('edit-weekly-room-loans')"
                       :to="`/weekly-room-loans/${loan.id}/edit`"
                       class="inline-flex items-center px-3 py-1.5 border border-gray-300 text-xs font-medium rounded-md bg-yellow-100 text-yellow-800 hover:bg-yellow-200 transition"
                     >
                       Edit
                     </router-link>
                     <button
+                      v-if="hasPermission('delete-weekly-room-loans')"
                       @click="remove(loan.id)"
                       class="inline-flex items-center px-3 py-1.5 border border-red-300 shadow-sm text-xs font-medium rounded-md text-red-700 bg-red-50 hover:bg-red-100"
                     >
@@ -131,10 +134,15 @@
 <script setup>
 import { ref, onMounted, computed } from 'vue'
 import axios from '../services/api'
+import { useUserStore } from '../stores/UserStore'
 
 const loans = ref([])
 const loading = ref(true)
 const error = ref(null)
+
+
+const userStore = useUserStore()
+const hasPermission = (perm) => userStore.permissions.includes(perm)
 
 const filters = ref({
   name: '',

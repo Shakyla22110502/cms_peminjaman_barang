@@ -5,17 +5,39 @@
     <form @submit.prevent="handleSubmit">
       <div class="mb-4">
         <label class="block font-medium mb-1 text-gray-700">Nama</label>
-        <input v-model="form.name" type="text" class="w-full border-gray-300 rounded-lg shadow-sm focus:ring-blue-500 focus:border-blue-500 px-4 py-2" />
+        <input
+          v-model="form.name"
+          type="text"
+          class="w-full border-gray-300 rounded-lg shadow-sm focus:ring-blue-500 focus:border-blue-500 px-4 py-2"
+        />
       </div>
 
       <div class="mb-4">
-        <label class="block font-medium mb-1 text-gray-700">Kode Serial</label>
-        <input v-model="form.serial_code" type="text" class="w-full border-gray-300 rounded-lg shadow-sm focus:ring-blue-500 focus:border-blue-500 px-4 py-2" />
+        <label for="serial_code" class="block text-sm font-medium text-gray-700">Serial Code</label>
+        <div class="flex gap-2 items-center">
+          <input
+            v-model="form.serial_code"
+            type="text"
+            id="serial_code"
+            class="mt-1 block w-full border-gray-300 rounded-md shadow-sm"
+            readonly
+          />
+          <button
+            type="button"
+            @click="generateSerialCode"
+            class="px-3 py-1 bg-blue-600 text-white rounded-md hover:bg-blue-700"
+          >
+            Generate
+          </button>
+        </div>
       </div>
 
       <div class="mb-4">
         <label class="block font-medium mb-1 text-gray-700">Status Ketersediaan</label>
-        <select v-model="form.is_available" class="w-full border-gray-300 rounded-lg shadow-sm focus:ring-blue-500 focus:border-blue-500 px-4 py-2">
+        <select
+          v-model="form.is_available"
+          class="w-full border-gray-300 rounded-lg shadow-sm focus:ring-blue-500 focus:border-blue-500 px-4 py-2"
+        >
           <option :value="true">Tersedia</option>
           <option :value="false">Dipinjam</option>
         </select>
@@ -23,7 +45,10 @@
 
       <div class="mb-4">
         <label class="block font-medium mb-1 text-gray-700">Aktif</label>
-        <select v-model="form.is_active" class="w-full border-gray-300 rounded-lg shadow-sm focus:ring-blue-500 focus:border-blue-500 px-4 py-2">
+        <select
+          v-model="form.is_active"
+          class="w-full border-gray-300 rounded-lg shadow-sm focus:ring-blue-500 focus:border-blue-500 px-4 py-2"
+        >
           <option :value="true">Ya</option>
           <option :value="false">Tidak</option>
         </select>
@@ -31,7 +56,10 @@
 
       <div class="mb-6">
         <label class="block font-medium mb-1 text-gray-700">Perlu Persetujuan Admin?</label>
-        <select v-model="form.is_approval" class="w-full border-gray-300 rounded-lg shadow-sm focus:ring-yellow-500 focus:border-yellow-500 px-4 py-2">
+        <select
+          v-model="form.is_approval"
+          class="w-full border-gray-300 rounded-lg shadow-sm focus:ring-yellow-500 focus:border-yellow-500 px-4 py-2"
+        >
           <option :value="true">Ya</option>
           <option :value="false">Tidak</option>
         </select>
@@ -39,7 +67,10 @@
 
       <!-- Submit + Cancel -->
       <div class="flex gap-2">
-        <button type="submit" class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition">
+        <button
+          type="submit"
+          class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition"
+        >
           {{ isEdit ? 'Update' : 'Simpan' }}
         </button>
         <button
@@ -71,6 +102,12 @@ const form = ref({
   is_approval: false, // ✅ Default: Tidak perlu persetujuan
 })
 
+const generateSerialCode = () => {
+  const prefix = 'IOT-'
+  const randomNumber = Math.floor(100 + Math.random() * 900) // contoh: 4 digit acak
+  form.value.serial_code = `${prefix}${randomNumber}`
+}
+
 const getItem = async () => {
   const { data } = await axios.get(`/items/${route.params.id}`)
   form.value = data.data
@@ -84,6 +121,11 @@ const handleSubmit = async () => {
 }
 
 onMounted(() => {
-  if (isEdit.value) getItem()
+  if (isEdit.value) {
+    getItem()
+  } else {
+    // Generate serial code hanya saat tambah
+    form.value.serial_code = generateSerialCode()
+  }
 })
 </script>

@@ -107,6 +107,7 @@ import { ref, computed, onMounted } from 'vue'
 import axios from '@/services/api'
 import { useUserStore } from '../stores/UserStore'
 
+
 const userStore = useUserStore()
 const hasPermission = (perm) => userStore.permissions.includes(perm)
 

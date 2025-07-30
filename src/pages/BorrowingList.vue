@@ -260,29 +260,6 @@ const filteredBorrowings = computed(() => {
 
 const formatDate = (dateStr) => (dateStr ? dateStr.slice(0, 10) : "-")
 
-//const approveBorrowing = async (id) => {
-//  if (!confirm("Setujui peminjaman ini?")) return
-//  try {
-//    await axios.put(`/borrowings/${id}`, { approval_status: "approved" })
-//    await fetchBorrowings()
-//    alert("Peminjaman disetujui!")
-//  } catch (err) {
-//    console.error(err)
-//    alert("Gagal menyetujui peminjaman.")
-//  }
-//}
-
-// const rejectBorrowing = async (id) => {
-//   if (!confirm("Tolak peminjaman ini?")) return
-//   try {
-//     await axios.put(`/borrowings/${id}`, { approval_status: "rejected" })
-//     await fetchBorrowings()
-//     alert("Peminjaman ditolak!")
-//   } catch (err) {
-//     console.error(err)
-//     alert("Gagal menolak peminjaman.")
-//   }
-// }
 
 const markReturned = async (id) => {
   if (!confirm("Tandai peminjaman sebagai sudah dikembalikan?")) return
