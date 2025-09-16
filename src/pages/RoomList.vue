@@ -1,53 +1,49 @@
 <template>
   <div class="min-h-screen bg-gray-50 p-6">
-    <div class="max-w-7xl mx-auto">
+    <div class="max-w-7xl mx-auto space-y-6">
       <!-- Header -->
-      <div
-        class="bg-white rounded-lg shadow-sm border p-6 mb-6 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4"
-      >
-        <div>
-          <h2 class="text-2xl font-bold text-gray-900">Daftar Ruangan</h2>
-          <p class="text-gray-600 mt-1">Kelola data ruangan yang tersedia</p>
+      <Card class="p-6">
+        <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+          <div>
+            <CardTitle>Daftar Ruangan</CardTitle>
+            <CardDescription>Kelola data ruangan yang tersedia</CardDescription>
+          </div>
+
+          <Button
+            v-if="hasPermission('create-rooms')"
+            @click="router.push('/rooms/create')"
+            variant="default"
+            class="inline-flex items-center gap-2"
+          >
+            <Plus class="w-4 h-4" /> Tambah Ruangan
+          </Button>
         </div>
-        <router-link
-          v-if="hasPermission('create-rooms')"
-          to="/rooms/create"
-          class="inline-flex items-center px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-lg shadow-sm transition-colors duration-200"
-        >
-          <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
-          </svg>
-          Tambah Ruangan
-        </router-link>
-      </div>
+      </Card>
 
       <!-- Filter -->
-      <div class="bg-white border rounded-lg p-4 mb-4 flex flex-col sm:flex-row gap-4 sm:items-end">
+      <Card class="p-4 flex flex-col sm:flex-row gap-4 sm:items-end">
         <div class="w-full sm:w-1/3">
-          <label class="block text-sm font-medium text-gray-700">Cari Nama Ruangan</label>
-          <input
-            type="text"
-            v-model="search"
-            placeholder="Nama Ruangan"
-            class="w-full border border-gray-300 rounded-lg shadow-sm px-4 py-2 focus:ring-blue-500 focus:border-blue-500"
-          />
+          <Label for="search">Cari Nama Ruangan</Label>
+          <Input id="search" v-model="search" placeholder="Nama Ruangan" />
         </div>
         <div class="w-full sm:w-48">
-          <label class="block text-sm font-medium text-gray-700">Status</label>
-          <select
-            v-model="statusFilter"
-            class="w-full border border-gray-300 rounded-lg shadow-sm px-4 py-2 focus:ring-blue-500 focus:border-blue-500"
-          >
-            <option value="semua">Semua</option>
-            <option value="aktif">Aktif</option>
-            <option value="nonaktif">Nonaktif</option>
-          </select>
+          <Label for="statusFilter">Status</Label>
+          <Select id="statusFilter" v-model="statusFilter">
+            <SelectTrigger>
+              <SelectValue placeholder="Semua" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="semua">Semua</SelectItem>
+              <SelectItem value="aktif">Aktif</SelectItem>
+              <SelectItem value="nonaktif">Nonaktif</SelectItem>
+            </SelectContent>
+          </Select>
         </div>
-      </div>
+      </Card>
 
       <!-- Tabel -->
-      <div class="bg-white rounded-lg shadow border overflow-x-auto">
-        <table class="min-w-full divide-y divide-gray-200">
+      <Card class="overflow-x-auto p-0">
+        <table class="w-full table-auto">
           <thead class="bg-gray-50">
             <tr>
               <th class="px-6 py-3 text-left text-xs font-medium text-blue-500 uppercase tracking-wider">Nama</th>
@@ -58,43 +54,36 @@
               <th class="px-6 py-3 text-left text-xs font-medium text-blue-500 uppercase tracking-wider">Aksi</th>
             </tr>
           </thead>
-          <tbody class="divide-y divide-gray-200">
-            <tr v-for="room in filteredRooms" :key="room.id">
+          <tbody>
+            <tr v-for="room in filteredRooms" :key="room.id" class="border-b">
               <td class="px-6 py-4">{{ room.name }}</td>
               <td class="px-6 py-4">{{ room.location }}</td>
               <td class="px-6 py-4">{{ room.capacity }}</td>
               <td class="px-6 py-4">{{ room.description || '-' }}</td>
               <td class="px-6 py-4">
-                <span
-                  :class="room.is_active ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'"
-                  class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium"
-                >
+                <Badge :variant="room.is_active ? 'success' : 'destructive'">
                   {{ room.is_active ? 'Aktif' : 'Nonaktif' }}
-                </span>
+                </Badge>
               </td>
-              <td class="px-6 py-4 space-x-3">
-                <router-link
+              <td class="px-6 py-4 flex gap-2">
+                <Button
                   v-if="hasPermission('edit-rooms')"
-                  :to="`/rooms/${room.id}/edit`"
-                  class="inline-flex items-center px-3 py-1.5 border border-gray-300 text-xs font-medium rounded-md bg-yellow-100 text-yellow-800 hover:bg-yellow-200 transition"
+                  size="sm"
+                  variant="secondary"
+                  @click="router.push(`/rooms/${room.id}/edit`)"
+                  class="inline-flex items-center gap-1"
                 >
-                  <svg class="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                      d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
-                  </svg>
-                  Edit
-                </router-link>
-                <button
+                  <Edit class="w-3 h-3" /> Edit
+                </Button>
+                <Button
                   v-if="hasPermission('delete-rooms')"
+                  size="sm"
+                  variant="destructive"
                   @click="deleteRoom(room.id)"
-                  class="inline-flex items-center px-3 py-1.5 border border-red-300 shadow-sm text-xs font-medium rounded-md text-red-700 bg-red-50 hover:bg-red-100"
+                  class="inline-flex items-center gap-1"
                 >
-                  <svg class="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                      d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                  </svg>
-                  Hapus
-                </button>
+                  <Trash class="w-3 h-3" /> Hapus
+                </Button>
               </td>
             </tr>
             <tr v-if="filteredRooms.length === 0">
@@ -102,16 +91,26 @@
             </tr>
           </tbody>
         </table>
-      </div>
+      </Card>
     </div>
   </div>
 </template>
 
 <script setup>
 import { ref, onMounted, computed } from 'vue'
-import axios from '../services/api'
-import { useUserStore } from '../stores/UserStore'
+import { useRouter } from 'vue-router'
+import axios from '@/services/api'
+import { useUserStore } from '@/stores/UserStore'
 
+import { Card, CardTitle, CardDescription } from '@/components/ui/card'
+import { Button } from '@/components/ui/button'
+import { Input } from '@/components/ui/input'
+import { Label } from '@/components/ui/label'
+import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from '@/components/ui/select'
+import { Badge } from '@/components/ui/badge'
+import { Plus, Edit, Trash } from 'lucide-vue-next'
+
+const router = useRouter()
 const userStore = useUserStore()
 const hasPermission = (perm) => userStore.permissions.includes(perm)
 

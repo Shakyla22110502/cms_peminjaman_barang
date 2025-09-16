@@ -1,4 +1,4 @@
-<template>
+ <template>
   <div class="min-h-screen flex items-center justify-center bg-gray-50 py-8">
     <div class="bg-white rounded-xl shadow-md w-full max-w-xl p-8">
       <h2 class="text-2xl font-bold mb-6 text-gray-900">

@@ -1,132 +1,158 @@
 <template>
-    <div class="min-h-screen bg-gray-50 p-6">
-      <div class="max-w-7xl mx-auto">
-        <!-- Header -->
-        <div class="bg-white rounded-lg shadow-sm border p-6 mb-6">
-          <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+  <div class="min-h-screen p-6">
+    <div class="max-w-5xl mx-auto space-y-6">
+      <!-- Header -->
+      <Card>
+        <CardHeader>
+          <div class="flex flex-col sm:flex-row justify-between sm:items-center gap-4">
             <div>
-              <h1 class="text-3xl font-bold text-gray-900">Manajemen Role</h1>
-              <p class="text-gray-600 mt-1">Kelola role dan hak akses pengguna</p>
+              <CardTitle class="text-2xl font-bold">Manajemen Role</CardTitle>
+              <CardDescription>
+                Kelola role dan hak akses pengguna
+              </CardDescription>
             </div>
-            <button
+            <Button
               v-if="hasPermission('create-roles')"
               @click="openModal(null)"
-              class="inline-flex items-center px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-lg shadow-sm transition-colors duration-200"
             >
-              <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
-              </svg>
-              Tambah Role
-            </button>
+              <Plus class="w-4 h-4 mr-2" /> Tambah Role
+            </Button>
           </div>
-        </div>
+        </CardHeader>
+      </Card>
 
-        <!-- Table -->
-        <div class="bg-white rounded-lg shadow-sm border overflow-hidden">
-          <!-- Filter -->
-          <div class="px-6 py-4 border-b border-gray-200 flex flex-col sm:flex-row sm:items-center gap-4">
-            <div class="w-full sm:w-64">
-              <input
-                v-model="search"
-                type="text"
-                placeholder="Cari Nama Role"
-                class="w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+      <!-- Table -->
+      <Card>
+        <!-- Filter -->
+        <CardHeader>
+          <Input 
+            v-model="search" 
+            type="text" 
+            placeholder="Cari nama role..." 
+            class="w-full sm:w-80"
+          />
+        </CardHeader>
+
+        <CardContent>
+          <Table>
+            <TableHeader>
+              <TableRow>
+                <TableHead>ID</TableHead>
+                <TableHead>Nama Role</TableHead>
+                <TableHead>Permissions</TableHead>
+                <TableHead v-if="hasPermission('edit-roles')" class="text-right">Aksi</TableHead>
+              </TableRow>
+            </TableHeader>
+
+            <TableBody>
+              <TableRow
+                v-for="(role, index) in filteredRoles"
+                :key="role.id"
+              >
+                <TableCell>{{ index + 1 }}</TableCell>
+                <TableCell class="font-medium">{{ role.name }}</TableCell>
+                <TableCell>
+                  <div class="flex flex-wrap gap-2">
+                    <Badge 
+                      v-for="perm in role.permissions" 
+                      :key="perm.id"
+                    >
+                      {{ perm.name }}
+                    </Badge>
+                    <span v-if="role.permissions.length === 0" class="text-gray-400 text-sm">
+                      Tidak ada permissions
+                    </span>
+                  </div>
+                </TableCell>
+                <TableCell v-if="hasPermission('edit-roles')" class="text-right">
+                  <div class="flex justify-end gap-2">
+                    <Button size="sm" variant="outline" @click="openModal(role)">
+                      Edit
+                    </Button>
+                    <Button
+                      v-if="hasPermission('delete-roles')"
+                      size="sm"
+                      variant="destructive"
+                      @click="deleteRole(role.id)"
+                    >
+                      Hapus
+                    </Button>
+                  </div>
+                </TableCell>
+              </TableRow>
+
+              <TableRow v-if="filteredRoles.length === 0">
+                <TableCell colspan="4" class="text-center py-10 text-gray-500">
+                  Tidak ada role ditemukan
+                </TableCell>
+              </TableRow>
+            </TableBody>
+          </Table>
+        </CardContent>
+      </Card>
+
+      <!-- Modal -->
+      <Dialog v-model:open="showModal">
+        <DialogContent class="sm:max-w-lg">
+          <DialogHeader>
+            <DialogTitle>
+              {{ editingRole ? 'Edit Role' : 'Tambah Role' }}
+            </DialogTitle>
+            <DialogDescription>
+              {{ editingRole ? 'Ubah data role yang dipilih' : 'Tambah role baru beserta permissions' }}
+            </DialogDescription>
+          </DialogHeader>
+
+          <form @submit.prevent="saveRole" class="space-y-6">
+            <div class="space-y-2">
+              <Label>Nama Role</Label>
+              <Input 
+                v-model="form.name" 
+                required 
+                placeholder="Masukkan nama role"
               />
             </div>
-          </div>
 
-          <!-- Table Data -->
-          <div class="overflow-x-auto">
-            <table class="min-w-full divide-y divide-gray-200">
-              <thead class="bg-gray-50">
-                <tr>
-                  <th class="px-6 py-3 text-left text-xs font-medium text-blue-500 uppercase tracking-wider">ID</th>
-                  <th class="px-6 py-3 text-left text-xs font-medium text-blue-500 uppercase tracking-wider">Nama Role</th>
-                  <th class="px-6 py-3 text-left text-xs font-medium text-blue-500 uppercase tracking-wider">Permissions</th>
-                  <th v-if="hasPermission('edit-roles')" class="px-6 py-3 text-right text-xs font-medium text-blue-500 uppercase tracking-wider">Aksi</th>
-                </tr>
-              </thead>
-              <tbody class="bg-white divide-y divide-gray-200">
-                <tr v-for="(role, index) in filteredRoles" :key="role.id" class="hover:bg-gray-50 transition-colors duration-150">
-                  <td class="px-6 py-4 text-sm text-gray-900">{{ index + 1 }}</td>
-                  <td class="px-6 py-4 font-medium text-gray-900">{{ role.name }}</td>
-                  <td class="px-6 py-4">
-                    <div class="flex flex-wrap gap-1">
-                      <span
-                        v-for="perm in role.permissions"
-                        :key="perm.id"
-                        class="inline-block bg-green-100 text-green-800 px-2 py-1 rounded text-xs"
-                      >
-                        {{ perm.name }}
-                      </span>
-                    </div>
-                  </td>
-                  <td class="px-6 py-4 text-right">
-                    <div class="flex justify-end space-x-2">
-                      <button
-                        v-if="hasPermission('edit-roles')"
-                        @click="openModal(role)"
-                        class="inline-flex items-center px-3 py-1.5 border border-gray-300 text-xs font-medium rounded-md bg-yellow-100 text-yellow-800 hover:bg-yellow-200 transition"
-                      >
-                        Edit
-                      </button>
-                      <button
-                        v-if="hasPermission('delete-roles')"
-                        @click="deleteRole(role.id)"
-                        class="inline-flex items-center px-3 py-1.5 border border-red-300 shadow-sm text-xs font-medium rounded-md text-red-700 bg-red-50 hover:bg-red-100"
-                      >
-                        Hapus
-                      </button>
-                    </div>
-                  </td>
-                </tr>
-                <tr v-if="filteredRoles.length === 0">
-                  <td colspan="4" class="text-center py-6 text-gray-500">Tidak ada role ditemukan.</td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
-        </div>
-
-        <!-- Modal -->
-        <div v-if="showModal" class="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
-          <div class="bg-white p-6 rounded-xl w-full max-w-lg">
-            <h2 class="text-xl font-semibold mb-4">{{ editingRole ? 'Edit Role' : 'Tambah Role' }}</h2>
-            <form @submit.prevent="saveRole">
-              <div class="mb-4">
-                <label class="block mb-1 text-sm text-gray-700">Nama Role</label>
-                <input v-model="form.name" type="text" class="w-full border rounded p-2" required />
+            <div class="space-y-2">
+              <Label>Permissions</Label>
+              <div v-if="allPermissions.length === 0" class="text-center py-4 text-gray-500">
+                Loading permissions...
               </div>
-
-              <div class="mb-4">
-                <label class="block mb-1 text-sm text-gray-700">Permissions</label>
-                <div v-if="allPermissions.length === 0" class="text-gray-500">
-                  Loading permissions...
-                </div>
-                <div v-else class="grid grid-cols-2 gap-2">
-                  <label v-for="permission in allPermissions" :key="permission.id" class="inline-flex items-center">
-                    <input
-                      type="checkbox"
-                      v-model="form.permissions"
-                      :value="permission.name"
-                      class="mr-2"
-                    />
-                    <span class="text-sm text-gray-700">{{ permission.name }}</span>
+              <div v-else class="grid grid-cols-1 sm:grid-cols-2 gap-3 max-h-64 overflow-y-auto border rounded-md p-4">
+                <div
+                  v-for="permission in allPermissions"
+                  :key="permission.id"
+                  class="flex items-center space-x-2"
+                >
+                  <Checkbox
+                    :id="'perm-' + permission.id"
+                    v-model:checked="form.permissions"
+                    :value="permission.name"
+                  />
+                  <label :for="'perm-' + permission.id" class="text-sm cursor-pointer">
+                    {{ permission.name }}
                   </label>
                 </div>
               </div>
+            </div>
 
-              <div class="flex justify-end gap-2">
-                <button type="button" @click="closeModal" class="px-4 py-2 rounded-xl bg-gray-300 hover:bg-gray-400">Batal</button>
-                <button type="submit" class="px-4 py-2 rounded-xl bg-blue-600 hover:bg-blue-700 text-white">
-                  Simpan
-                </button>
-              </div>
-            </form>
-          </div>
-        </div>
-      </div>
+            <DialogFooter class="flex gap-2 justify-end">
+              <Button 
+                type="button" 
+                variant="outline" 
+                @click="closeModal"
+              >
+                Batal
+              </Button>
+              <Button type="submit">
+                Simpan
+              </Button>
+            </DialogFooter>
+          </form>
+        </DialogContent>
+      </Dialog>
     </div>
+  </div>
 </template>
 
 <script setup>
@@ -134,6 +160,20 @@ import { ref, onMounted, computed } from 'vue'
 import axios from '../services/api'
 import { useUserStore } from '../stores/UserStore'
 
+// shadcn-vue imports
+import { Button } from '@/components/ui/button'
+import { Input } from '@/components/ui/input'
+import { Label } from '@/components/ui/label'
+import { Checkbox } from '@/components/ui/checkbox'
+import { Badge } from '@/components/ui/badge'
+import { Card, CardHeader, CardTitle, CardDescription, CardContent } from '@/components/ui/card'
+import {
+  Table, TableHeader, TableBody, TableRow, TableHead, TableCell
+} from '@/components/ui/table'
+import {
+  Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter
+} from '@/components/ui/dialog'
+import { Plus } from 'lucide-vue-next'
 
 const userStore = useUserStore()
 const hasPermission = (perm) => userStore.permissions.includes(perm)
@@ -145,7 +185,6 @@ const editingRole = ref(null)
 const form = ref({ name: '', permissions: [] })
 const search = ref('')
 
-// Filter roles by name
 const filteredRoles = computed(() => {
   return roles.value.filter(role =>
     role.name.toLowerCase().includes(search.value.toLowerCase())
@@ -230,9 +269,3 @@ onMounted(() => {
   fetchPermissions()
 })
 </script>
-
-<style scoped>
-input[type='checkbox']:checked {
-  accent-color: #2563eb;
-}
-</style>

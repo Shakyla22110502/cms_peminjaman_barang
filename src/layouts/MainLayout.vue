@@ -9,9 +9,10 @@
       <Navbar />
 
       <!-- Page Content -->
-      <main class="flex-1 bg-gray-100 p-6 overflow-y-auto">
-        <RouterView />
-      </main>
+     <main class="flex-1 bg-gray-100 p-6 overflow-y-auto relative z-10">
+      <RouterView />
+    </main>
+
     </div>
   </div>
 </template>

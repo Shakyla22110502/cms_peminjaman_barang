@@ -1,210 +1,183 @@
 <template>
   <div class="min-h-screen bg-gray-50 p-6">
-    <div class="max-w-7xl mx-auto">
+    <div class="max-w-7xl mx-auto space-y-6">
       <!-- Header -->
-      <div class="bg-white rounded-lg shadow-sm border p-6 mb-6 flex justify-between items-center">
-        <div>
-          <h1 class="text-3xl font-bold text-gray-900">Manajemen Peminjaman</h1>
-          <p class="text-gray-600 mt-1">Kelola data peminjaman barang</p>
-        </div>
-        <router-link
-          v-if="hasPermission('create-borrowing')"
-          to="/borrowings/create"
-          class="inline-flex items-center px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-lg shadow-sm transition-colors"
-        >
-          <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path
-              stroke-linecap="round"
-              stroke-linejoin="round"
-              stroke-width="2"
-              d="M12 4v16m8-8H4"
-            />
-          </svg>
-          Tambah Peminjaman
-        </router-link>
-      </div>
+      <Card>
+        <CardHeader class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+          <div>
+            <CardTitle class="text-2xl font-bold">Manajemen Peminjaman</CardTitle>
+            <CardDescription>Kelola data peminjaman barang dengan mudah</CardDescription>
+          </div>
+          <Button v-if="hasPermission('create-borrowing')" asChild>
+            <router-link to="/borrowings/create" class="flex items-center gap-2">
+              <Plus class="w-4 h-4" />
+              Tambah Peminjaman
+            </router-link>
+          </Button>
+        </CardHeader>
+      </Card>
 
       <!-- Filter -->
-      <div class="bg-white rounded-lg shadow-sm border p-4 mb-6 flex flex-col sm:flex-row gap-4">
-        <input
-          v-model="search"
-          type="text"
-          placeholder="Cari nama peminjam / barang"
-          class="w-full sm:w-64 px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 text-sm"
-        />
-        <select
-          v-model="statusFilter"
-          class="w-full sm:w-48 px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 text-sm"
-        >
-          <option value="">Semua Status</option>
-          <option value="borrowed">Dipinjam</option>
-          <option value="returned">Dikembalikan</option>
-        </select>
-        <select
-          v-model="approvalFilter"
-          class="w-full sm:w-48 px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 text-sm"
-        >
-          <option value="">Semua Persetujuan</option>
-          <option value="pending">Menunggu</option>
-          <option value="approved">Disetujui</option>
-          <option value="rejected">Ditolak</option>
-        </select>
-      </div>
+      <Card>
+        <CardContent class="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <!-- Search -->
+          <div class="space-y-2">
+            <Label>Cari Peminjam/Barang</Label>
+            <Input v-model="search" placeholder="Cari nama peminjam atau barang" />
+          </div>
 
-      <!-- Tabel -->
-      <div class="bg-white rounded-lg shadow-sm border overflow-hidden">
-        <div class="px-6 py-4 border-b border-gray-200">
-          <h3 class="text-lg font-semibold text-gray-900">Daftar Peminjaman</h3>
-        </div>
+          <!-- Status Peminjaman -->
+          <div class="space-y-2">
+            <Label>Status Peminjaman</Label>
+            <Select v-model="statusFilter">
+              <SelectTrigger>
+                <SelectValue placeholder="Semua Status" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">Semua Status</SelectItem>
+                <SelectItem value="borrowed">Dipinjam</SelectItem>
+                <SelectItem value="returned">Dikembalikan</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
 
-        <div v-if="loading" class="p-6 text-gray-500">Memuat data...</div>
-        <div v-else-if="error" class="p-6 text-red-500">{{ error }}</div>
+          <!-- Status Persetujuan -->
+          <div class="space-y-2">
+            <Label>Status Persetujuan</Label>
+            <Select v-model="approvalFilter">
+              <SelectTrigger>
+                <SelectValue placeholder="Semua Persetujuan" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">Semua Persetujuan</SelectItem>
+                <SelectItem value="pending">Menunggu</SelectItem>
+                <SelectItem value="approved">Disetujui</SelectItem>
+                <SelectItem value="rejected">Ditolak</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+        </CardContent>
+      </Card>
 
-        <div v-else class="overflow-x-auto">
-          <table class="min-w-full divide-y divide-gray-200">
-            <thead class="bg-gray-50">
-              <tr>
-                <th class="px-6 py-3 text-left text-xs font-medium text-blue-500 uppercase">
-                  Peminjam
-                </th>
-                <th class="px-6 py-3 text-left text-xs font-medium text-blue-500 uppercase">
-                  Barang
-                </th>
-                <th class="px-6 py-3 text-left text-xs font-medium text-blue-500 uppercase">
-                  Tgl Pinjam
-                </th>
-                <th class="px-6 py-3 text-left text-xs font-medium text-blue-500 uppercase">
-                  Tgl Kembali
-                </th>
-                <th class="px-6 py-3 text-left text-xs font-medium text-blue-500 uppercase">
-                  Status
-                </th>
-                <th class="px-6 py-3 text-left text-xs font-medium text-blue-500 uppercase">
-                  Persetujuan
-                </th>
-                <th class="px-6 py-3 text-right text-xs font-medium text-blue-500 uppercase">
-                  Aksi
-                </th>
-              </tr>
-            </thead>
-            <tbody class="bg-white divide-y divide-gray-200">
-              <tr
-                v-for="borrowing in filteredBorrowings"
-                :key="borrowing.id"
-                class="hover:bg-gray-50"
-              >
-                <td class="px-6 py-4 text-sm text-gray-900">{{ borrowing.user?.name || '-' }}</td>
-                <td class="px-6 py-4 text-sm text-gray-900">{{ borrowing.item?.name || '-' }}</td>
-                <td class="px-6 py-4 text-sm text-gray-700">
-                  {{ formatDate(borrowing.borrow_date) }}
-                </td>
-                <td class="px-6 py-4 text-sm text-gray-700">
-                  {{ formatDate(borrowing.return_date) }}
-                </td>
-                <td class="px-6 py-4">
-                  <span
-                    :class="
-                      borrowing.is_returned
-                        ? 'bg-green-100 text-green-800'
-                        : 'bg-yellow-100 text-yellow-800'
-                    "
-                    class="px-2.5 py-0.5 rounded-full text-xs font-medium"
-                  >
-                    {{ borrowing.is_returned ? 'Dikembalikan' : 'Dipinjam' }}
-                  </span>
-                </td>
-                <td class="px-6 py-4">
-                  <span
-                    :class="{
-                      'bg-yellow-100 text-yellow-800': borrowing.approval_status === 'pending',
-                      'bg-green-100 text-green-800': borrowing.approval_status === 'approved',
-                      'bg-red-100 text-red-800': borrowing.approval_status === 'rejected',
-                    }"
-                    class="px-2.5 py-0.5 rounded-full text-xs font-medium"
-                  >
-                    {{ borrowing.approval_status || '-' }}
-                  </span>
-                </td>
-                <td class="px-6 py-4 text-right">
-                  <div class="flex justify-end space-x-2">
-                    <!-- Approve -->
-                    <!-- <button
-                      v-if="borrowing.approval_status === 'pending'"
-                      @click="approveBorrowing(borrowing.id)"
-                      class="px-3 py-1 border border-green-300 text-xs rounded-md text-green-700 bg-green-50 hover:bg-green-100"
+      <!-- Table -->
+      <Card>
+        <CardHeader>
+          <CardTitle class="text-xl font-semibold">Daftar Peminjaman</CardTitle>
+        </CardHeader>
+
+        <CardContent>
+          <!-- Loading -->
+          <div v-if="loading" class="flex justify-center py-8">
+            <span class="text-muted-foreground">Memuat data...</span>
+          </div>
+
+          <!-- Error -->
+          <div v-else-if="error" class="text-center py-8">
+            <p class="text-red-500 mb-4">{{ error }}</p>
+            <Button @click="fetchBorrowings">Coba Lagi</Button>
+          </div>
+
+          <!-- Table -->
+          <div v-else class="overflow-x-auto">
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead>Peminjam</TableHead>
+                  <TableHead>Barang</TableHead>
+                  <TableHead>Tgl Pinjam</TableHead>
+                  <TableHead>Tgl Kembali</TableHead>
+                  <TableHead>Status</TableHead>
+                  <TableHead>Persetujuan</TableHead>
+                  <TableHead class="text-right">Aksi</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                <TableRow
+                  v-for="borrowing in filteredBorrowings"
+                  :key="borrowing.id"
+                >
+                  <TableCell>
+                    <div class="flex items-center gap-2">
+                      <Avatar>
+                        <AvatarFallback>
+                          {{ borrowing.user?.name?.charAt(0)?.toUpperCase() || "U" }}
+                        </AvatarFallback>
+                      </Avatar>
+                      <div>
+                        <div class="font-medium">{{ borrowing.user?.name || "-" }}</div>
+                        <div class="text-xs text-muted-foreground">ID: {{ borrowing.user?.id }}</div>
+                      </div>
+                    </div>
+                  </TableCell>
+
+                  <TableCell>
+                    <div class="font-medium">{{ borrowing.item?.name || "-" }}</div>
+                    <div class="text-xs text-muted-foreground">Kode: {{ borrowing.item?.code }}</div>
+                  </TableCell>
+
+                  <TableCell>{{ formatDate(borrowing.borrow_date) }}</TableCell>
+                  <TableCell>{{ formatDate(borrowing.return_date) }}</TableCell>
+
+                  <TableCell>
+                    <Badge :variant="borrowing.is_returned ? 'success' : 'warning'">
+                      {{ borrowing.is_returned ? "Dikembalikan" : "Dipinjam" }}
+                    </Badge>
+                  </TableCell>
+
+                  <TableCell>
+                    <Badge
+                      :variant="{
+                        pending: 'warning',
+                        approved: 'success',
+                        rejected: 'destructive'
+                      }[borrowing.approval_status] || 'secondary'"
                     >
-                      Setujui
-                    </button>
-                    Reject
-                    <button
-                      v-if="borrowing.approval_status === 'pending'"
-                      @click="rejectBorrowing(borrowing.id)"
-                      class="px-3 py-1 border border-red-300 text-xs rounded-md text-red-700 bg-red-50 hover:bg-red-100"
-                    >
-                      Tolak
-                    </button> -->
-                    <!-- Edit -->
-                    <router-link
+                      {{ borrowing.approval_status || "-" }}
+                    </Badge>
+                  </TableCell>
+
+                  <TableCell class="text-right space-x-2">
+                    <Button
                       v-if="hasPermission('edit-borrowing')"
-                      :to="`/borrowings/${borrowing.id}/edit`"
-                      class="px-3 py-1 border border-yellow-300 text-xs rounded-md text-yellow-700 bg-yellow-50 hover:bg-yellow-100"
+                      size="sm"
+                      variant="outline"
+                      asChild
                     >
-                      Edit
-                    </router-link>
-                    <button
+                      <router-link :to="`/borrowings/${borrowing.id}/edit`">
+                        Edit
+                      </router-link>
+                    </Button>
+
+                    <Button
                       v-if="!borrowing.is_returned"
+                      size="sm"
+                      variant="outline"
                       @click="markReturned(borrowing.id)"
-                      class="inline-flex items-center px-3 py-1.5 border border-green-300 shadow-sm text-xs font-medium rounded-md text-green-700 bg-green-50 hover:bg-green-100"
                     >
-                      <svg
-                        class="w-3 h-3 mr-1"
-                        fill="none"
-                        stroke="currentColor"
-                        viewBox="0 0 24 24"
-                      >
-                        <path
-                          stroke-linecap="round"
-                          stroke-linejoin="round"
-                          stroke-width="2"
-                          d="M5 13l4 4L19 7"
-                        />
-                      </svg>
                       Kembalikan
-                    </button>
-                    <!-- Hapus -->
-                    <button
+                    </Button>
+
+                    <Button
                       v-if="hasPermission('delete-borrowing')"
+                      size="sm"
+                      variant="destructive"
                       @click="remove(borrowing.id)"
-                      class="px-3 py-1 border border-red-300 text-xs rounded-md text-red-700 bg-red-50 hover:bg-red-100"
                     >
                       Hapus
-                    </button>
-                  </div>
-                </td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
+                    </Button>
+                  </TableCell>
+                </TableRow>
+              </TableBody>
+            </Table>
+          </div>
 
-        <!-- Empty -->
-        <div v-if="!loading && filteredBorrowings.length === 0" class="text-center py-12">
-          <svg
-            class="mx-auto h-12 w-12 text-gray-400"
-            fill="none"
-            stroke="currentColor"
-            viewBox="0 0 24 24"
-          >
-            <path
-              stroke-linecap="round"
-              stroke-linejoin="round"
-              stroke-width="2"
-              d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2"
-            />
-          </svg>
-          <h3 class="mt-2 text-sm font-medium text-gray-900">Tidak ada peminjaman ditemukan</h3>
-          <p class="mt-1 text-sm text-gray-500">Coba ubah kata kunci atau filter.</p>
-        </div>
-      </div>
+          <!-- Empty -->
+          <div v-if="!loading && filteredBorrowings.length === 0" class="text-center py-16">
+            <Inbox class="w-10 h-10 mx-auto text-muted-foreground mb-3" />
+            <p class="text-muted-foreground">Tidak ada peminjaman ditemukan.</p>
+          </div>
+        </CardContent>
+      </Card>
     </div>
   </div>
 </template>
@@ -214,6 +187,16 @@ import { ref, computed, onMounted } from "vue"
 import axios from "@/services/api"
 import { useUserStore } from "@/stores/UserStore"
 
+import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/components/ui/card"
+import { Button } from "@/components/ui/button"
+import { Input } from "@/components/ui/input"
+import { Label } from "@/components/ui/label"
+import { Select, SelectTrigger, SelectContent, SelectItem, SelectValue } from "@/components/ui/select"
+import { Badge } from "@/components/ui/badge"
+import { Table, TableHeader, TableBody, TableHead, TableRow, TableCell } from "@/components/ui/table"
+import { Avatar, AvatarFallback } from "@/components/ui/avatar"
+import { Plus, Inbox } from "lucide-vue-next"
+
 const userStore = useUserStore()
 const hasPermission = (perm) => userStore.permissions.includes(perm)
 
@@ -221,8 +204,8 @@ const borrowings = ref([])
 const loading = ref(true)
 const error = ref(null)
 const search = ref("")
-const statusFilter = ref("")
-const approvalFilter = ref("")
+const statusFilter = ref("all")
+const approvalFilter = ref("all")
 
 const fetchBorrowings = async () => {
   loading.value = true
@@ -231,35 +214,33 @@ const fetchBorrowings = async () => {
     const res = await axios.get("/borrowings")
     borrowings.value = res.data.data
   } catch (err) {
-    error.value = "Gagal memuat data."
+    error.value = "Gagal memuat data peminjaman."
     console.error(err)
   } finally {
     loading.value = false
   }
 }
 
-const filteredBorrowings = computed(() => {
-  return borrowings.value.filter(b => {
+const filteredBorrowings = computed(() =>
+  borrowings.value.filter((b) => {
     const keyword = search.value.toLowerCase()
     const matchKeyword =
       b.user?.name?.toLowerCase().includes(keyword) ||
       b.item?.name?.toLowerCase().includes(keyword)
 
     const matchStatus =
-      statusFilter.value === "" ||
+      statusFilter.value === "all" ||
       (statusFilter.value === "borrowed" && !b.is_returned) ||
       (statusFilter.value === "returned" && b.is_returned)
 
     const matchApproval =
-      approvalFilter.value === "" ||
-      b.approval_status === approvalFilter.value
+      approvalFilter.value === "all" || b.approval_status === approvalFilter.value
 
     return matchKeyword && matchStatus && matchApproval
   })
-})
+)
 
 const formatDate = (dateStr) => (dateStr ? dateStr.slice(0, 10) : "-")
-
 
 const markReturned = async (id) => {
   if (!confirm("Tandai peminjaman sebagai sudah dikembalikan?")) return
@@ -277,7 +258,7 @@ const remove = async (id) => {
   if (!confirm("Yakin ingin menghapus peminjaman ini?")) return
   try {
     await axios.delete(`/borrowings/${id}`)
-    borrowings.value = borrowings.value.filter(b => b.id !== id)
+    borrowings.value = borrowings.value.filter((b) => b.id !== id)
   } catch (err) {
     alert("Gagal menghapus peminjaman.")
     console.error(err)

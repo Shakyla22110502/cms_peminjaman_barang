@@ -1,131 +1,171 @@
 <template>
-  <div class="max-w-xl mx-auto bg-white p-6 rounded shadow">
-    <h2 class="text-xl font-bold mb-4">{{ isEdit ? 'Edit' : 'Tambah' }} Item</h2>
+  <div class="min-h-screen bg-gray-50 py-8">
+  <div class="max-w-2xl mx-auto px-4">
+    <Card>
+      <CardHeader>
+        <CardTitle class="text-xl font-bold">{{ isEdit ? "Edit" : "Tambah" }} Item</CardTitle>
+        <CardDescription>
+          {{ isEdit ? "Ubah data item yang sudah ada" : "Isi data item baru di bawah ini" }}
+        </CardDescription>
+      </CardHeader>
 
-    <form @submit.prevent="handleSubmit">
-      <div class="mb-4">
-        <label class="block font-medium mb-1 text-gray-700">Nama</label>
-        <input
-          v-model="form.name"
-          type="text"
-          class="w-full border-gray-300 rounded-lg shadow-sm focus:ring-blue-500 focus:border-blue-500 px-4 py-2"
-        />
-      </div>
+      <CardContent>
+        <form @submit.prevent="handleSubmit" class="space-y-6">
+          <!-- Nama Item -->
+          <div class="space-y-2">
+            <Label for="name">Nama Item</Label>
+            <Input id="name" v-model="form.name" placeholder="Masukkan nama item" />
+          </div>
 
-      <div class="mb-4">
-        <label for="serial_code" class="block text-sm font-medium text-gray-700">Serial Code</label>
-        <div class="flex gap-2 items-center">
-          <input
-            v-model="form.serial_code"
-            type="text"
-            id="serial_code"
-            class="mt-1 block w-full border-gray-300 rounded-md shadow-sm"
-            readonly
-          />
-          <button
-            type="button"
-            @click="generateSerialCode"
-            class="px-3 py-1 bg-blue-600 text-white rounded-md hover:bg-blue-700"
-          >
-            Generate
-          </button>
-        </div>
-      </div>
+          <!-- Serial Code -->
+          <div class="space-y-2">
+            <Label for="serial_code">Kode Serial</Label>
+            <div class="flex gap-2">
+              <Input id="serial_code" v-model="form.serial_code" readonly class="flex-1" />
+              <Button type="button" variant="secondary" @click="generateSerialCode">
+                Generate
+              </Button>
+            </div>
+          </div>
 
-      <div class="mb-4">
-        <label class="block font-medium mb-1 text-gray-700">Status Ketersediaan</label>
-        <select
-          v-model="form.is_available"
-          class="w-full border-gray-300 rounded-lg shadow-sm focus:ring-blue-500 focus:border-blue-500 px-4 py-2"
-        >
-          <option :value="true">Tersedia</option>
-          <option :value="false">Dipinjam</option>
-        </select>
-      </div>
+          <!-- Status Ketersediaan -->
+          <div class="space-y-2">
+            <Label for="is_available">Status Ketersediaan</Label>
+            <Select v-model="form.is_available">
+              <SelectTrigger class="w-full">
+                <SelectValue placeholder="Pilih status ketersediaan" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="true">Tersedia</SelectItem>
+                <SelectItem value="false">Dipinjam</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
 
-      <div class="mb-4">
-        <label class="block font-medium mb-1 text-gray-700">Aktif</label>
-        <select
-          v-model="form.is_active"
-          class="w-full border-gray-300 rounded-lg shadow-sm focus:ring-blue-500 focus:border-blue-500 px-4 py-2"
-        >
-          <option :value="true">Ya</option>
-          <option :value="false">Tidak</option>
-        </select>
-      </div>
+          <!-- Aktif -->
+          <div class="space-y-2">
+            <Label for="is_active">Status Aktif</Label>
+            <Select v-model="form.is_active">
+              <SelectTrigger class="w-full">
+                <SelectValue placeholder="Pilih status aktif" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="true">Aktif</SelectItem>
+                <SelectItem value="false">Tidak Aktif</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
 
-      <div class="mb-6">
-        <label class="block font-medium mb-1 text-gray-700">Perlu Persetujuan Admin?</label>
-        <select
-          v-model="form.is_approval"
-          class="w-full border-gray-300 rounded-lg shadow-sm focus:ring-yellow-500 focus:border-yellow-500 px-4 py-2"
-        >
-          <option :value="true">Ya</option>
-          <option :value="false">Tidak</option>
-        </select>
-      </div>
+          <!-- Persetujuan -->
+          <div class="space-y-2">
+            <Label for="is_approval">Perlu Persetujuan Admin</Label>
+            <Select v-model="form.is_approval">
+              <SelectTrigger class="w-full">
+                <SelectValue placeholder="Pilih status persetujuan" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="true">Ya, perlu persetujuan</SelectItem>
+                <SelectItem value="false">Tidak perlu persetujuan</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+        </form>
+      </CardContent>
 
-      <!-- Submit + Cancel -->
-      <div class="flex gap-2">
-        <button
-          type="submit"
-          class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition"
-        >
-          {{ isEdit ? 'Update' : 'Simpan' }}
-        </button>
-        <button
-          type="button"
-          @click="router.back()"
-          class="px-4 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 transition"
-        >
-          Batal
-        </button>
-      </div>
-    </form>
+      <CardFooter class="flex justify-end gap-2">
+        <Button type="button" variant="outline" @click="router.back()">Batal</Button>
+        <Button type="submit" @click="handleSubmit">
+          {{ isEdit ? "Update" : "Simpan" }}
+        </Button>
+      </CardFooter>
+    </Card>
+  </div>
   </div>
 </template>
 
 <script setup>
-import { ref, onMounted, computed } from 'vue'
-import { useRoute, useRouter } from 'vue-router'
-import axios from '../services/api'
+import { ref, onMounted, computed } from "vue"
+import { useRoute, useRouter } from "vue-router"
+import axios from "../services/api"
+
+import {
+  Card,
+  CardHeader,
+  CardTitle,
+  CardDescription,
+  CardContent,
+  CardFooter,
+} from "@/components/ui/card"
+import { Button } from "@/components/ui/button"
+import { Input } from "@/components/ui/input"
+import { Label } from "@/components/ui/label"
+import {
+  Select,
+  SelectTrigger,
+  SelectContent,
+  SelectItem,
+  SelectValue,
+} from "@/components/ui/select"
 
 const route = useRoute()
 const router = useRouter()
 const isEdit = computed(() => !!route.params.id)
 
 const form = ref({
-  name: '',
-  serial_code: '',
-  is_available: true,
-  is_active: true,
-  is_approval: false, // ✅ Default: Tidak perlu persetujuan
+  name: "",
+  serial_code: "",
+  is_available: "true",
+  is_active: "true",
+  is_approval: "false",
 })
 
 const generateSerialCode = () => {
-  const prefix = 'IOT-'
-  const randomNumber = Math.floor(100 + Math.random() * 900) // contoh: 4 digit acak
-  form.value.serial_code = `${prefix}${randomNumber}`
+  const prefix = "IOT-"
+  const randomNumber = Math.floor(1000 + Math.random() * 9000)
+  const timestamp = new Date().getTime().toString().slice(-4)
+  form.value.serial_code = `${prefix}${randomNumber}${timestamp}`
 }
 
 const getItem = async () => {
-  const { data } = await axios.get(`/items/${route.params.id}`)
-  form.value = data.data
+  try {
+    const { data } = await axios.get(`/items/${route.params.id}`)
+    form.value = {
+      ...data.data,
+      is_available: String(data.data.is_available),
+      is_active: String(data.data.is_active),
+      is_approval: String(data.data.is_approval),
+    }
+  } catch (error) {
+    console.error(error)
+    alert("Gagal memuat data item")
+  }
 }
 
 const handleSubmit = async () => {
-  const url = isEdit.value ? `/items/${route.params.id}` : '/items'
-  const method = isEdit.value ? 'put' : 'post'
-  await axios({ method, url, data: form.value })
-  router.push('/items')
+  const payload = {
+    ...form.value,
+    is_available: form.value.is_available === "true",
+    is_active: form.value.is_active === "true",
+    is_approval: form.value.is_approval === "true",
+  }
+
+  try {
+    const url = isEdit.value ? `/items/${route.params.id}` : "/items"
+    const method = isEdit.value ? "put" : "post"
+    await axios({ method, url, data: payload })
+    alert(`Item berhasil ${isEdit.value ? "diperbarui" : "ditambahkan"}!`)
+    router.push("/items")
+  } catch (error) {
+    console.error(error)
+    alert("Gagal menyimpan item")
+  }
 }
 
 onMounted(() => {
   if (isEdit.value) {
     getItem()
   } else {
-    // Generate serial code hanya saat tambah
-    form.value.serial_code = generateSerialCode()
+    generateSerialCode()
   }
 })
 </script>

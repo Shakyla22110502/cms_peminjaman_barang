@@ -1,88 +1,135 @@
 <template>
-  <div class="max-w-xl mx-auto bg-white p-6 rounded shadow">
-    <h2 class="text-xl font-bold mb-4">{{ isEdit ? 'Edit' : 'Tambah' }} User</h2>
+  <div class="min-h-screen bg-gray-50 py-8">
+    <div class="max-w-2xl mx-auto px-4">
+      <Card>
+        <!-- Header -->
+        <CardHeader>
+          <CardTitle class="text-xl font-bold">
+            {{ isEdit ? 'Edit' : 'Tambah' }} User
+          </CardTitle>
+          <CardDescription>
+            Isi data untuk {{ isEdit ? 'memperbarui' : 'menambahkan' }} user
+          </CardDescription>
+        </CardHeader>
 
-    <form @submit.prevent="handleSubmit">
-      <!-- Nama -->
-      <div class="mb-4">
-        <label class="block">Nama</label>
-        <input v-model="form.name" type="text" class="w-full border p-2 rounded" />
-      </div>
+        <CardContent>
+          <form @submit.prevent="handleSubmit" class="space-y-6">
+            <!-- Nama -->
+            <div class="space-y-2">
+              <Label for="name">Nama Lengkap</Label>
+              <Input
+                id="name"
+                v-model="form.name"
+                type="text"
+                placeholder="Masukkan nama lengkap"
+              />
+            </div>
 
-      <!-- Email -->
-      <div class="mb-4">
-        <label class="block">Email</label>
-        <input v-model="form.email" type="email" class="w-full border p-2 rounded" />
-      </div>
+            <!-- Email -->
+            <div class="space-y-2">
+              <Label for="email">Email</Label>
+              <Input
+                id="email"
+                v-model="form.email"
+                type="email"
+                placeholder="contoh@email.com"
+              />
+            </div>
 
-      <!-- Phone -->
-      <div class="mb-4">
-        <label class="block mb-1">Nomor Telepon</label>
-        <div class="flex">
-          <span
-            class="inline-flex items-center px-3 rounded-l border border-r-0 border-gray-300 bg-gray-100 text-gray-700 text-sm"
-          >
-            +62
-          </span>
-          <input
-            v-model="form.phone_without_prefix"
-            type="tel"
-            class="w-full border border-gray-300 p-2 rounded-r"
-            placeholder="81234567890"
-          />
-        </div>
-      </div>
+            <!-- Phone -->
+            <div class="space-y-2">
+              <Label for="phone">Nomor Telepon</Label>
+              <div class="flex">
+                <span class="inline-flex items-center px-3 border border-r-0 border-input bg-gray-100 text-gray-600 text-sm">
+                  +62
+                </span>
+                <Input
+                  id="phone"
+                  v-model="form.phone_without_prefix"
+                  type="tel"
+                  placeholder="81234567890"
+                  class="rounded-l-none"
+                />
+              </div>
+            </div>
 
-      <!-- Password (hanya saat create) -->
-      <div class="mb-4" v-if="!isEdit">
-        <label class="block">Password</label>
-        <input v-model="form.password" type="password" class="w-full border p-2 rounded" />
-      </div>
+            <!-- Password (hanya saat create) -->
+            <div v-if="!isEdit" class="space-y-2">
+              <Label for="password">Password</Label>
+              <Input
+                id="password"
+                v-model="form.password"
+                type="password"
+                placeholder="Masukkan password"
+              />
+            </div>
 
-      <div class="mb-4" v-if="!isEdit">
-        <label class="block">Konfirmasi Password</label>
-        <input
-          v-model="form.password_confirmation"
-          type="password"
-          class="w-full border p-2 rounded"
-        />
-      </div>
+            <div v-if="!isEdit" class="space-y-2">
+              <Label for="password_confirmation">Konfirmasi Password</Label>
+              <Input
+                id="password_confirmation"
+                v-model="form.password_confirmation"
+                type="password"
+                placeholder="Konfirmasi password"
+              />
+            </div>
 
-      <!-- Code -->
-      <div class="mb-4">
-        <label class="block">Code</label>
-        <input v-model="form.code" type="text" class="w-full border p-2 rounded" />
-      </div>
+            <!-- Code -->
+            <div class="space-y-2">
+              <Label for="code">Kode Unik</Label>
+              <Input
+                id="code"
+                v-model="form.code"
+                type="text"
+                placeholder="Masukkan kode unik"
+              />
+            </div>
 
-      <!-- Code NFC -->
-      <div class="mb-4">
-        <label class="block">Code NFC</label>
-        <input v-model="form.code_nfc" type="text" class="w-full border p-2 rounded" />
-      </div>
+            <!-- Code NFC -->
+            <div class="space-y-2">
+              <Label for="code_nfc">Kode NFC</Label>
+              <Input
+                id="code_nfc"
+                v-model="form.code_nfc"
+                type="text"
+                placeholder="Masukkan kode NFC"
+              />
+            </div>
 
-      <!-- Role -->
-      <div class="mb-4">
-        <label class="block">Role</label>
-        <select v-model="form.roles" class="w-full border p-2 rounded">
-          <option value="">Pilih Role</option>
-          <option v-for="role in allRoles" :key="role" :value="role">{{ role }}</option>
-        </select>
-      </div>
+            <!-- Role -->
+            <div class="space-y-2">
+              <Label for="roles">Role</Label>
+              <Select v-model="form.roles">
+                <SelectTrigger id="roles" class="w-full">
+                  <SelectValue placeholder="Pilih Role" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectGroup>
+                    <SelectLabel>Daftar Role</SelectLabel>
+                    <SelectItem
+                      v-for="role in allRoles"
+                      :key="role"
+                      :value="role"
+                    >
+                      {{ role }}
+                    </SelectItem>
+                  </SelectGroup>
+                </SelectContent>
+              </Select>
+            </div>
+          </form>
+        </CardContent>
 
-      <!-- Submit + Cancel -->
-      <div class="flex gap-2">
-        <button type="submit" class="bg-blue-600 text-white px-4 py-2 rounded">
-          {{ isEdit ? 'Update' : 'Simpan' }}
-        </button>
-        <button
-          type="button"
-          @click="router.back()"
-          class="bg-gray-300 text-gray-800 px-4 py-2 rounded"
-        >
-          Cancel
-        </button>
-      </div>
-    </form>
+        <CardFooter class="flex justify-end gap-2">
+          <Button variant="outline" type="button" @click="router.back()">
+            Batal
+          </Button>
+          <Button type="submit" @click="handleSubmit">
+            {{ isEdit ? 'Update' : 'Simpan' }}
+          </Button>
+        </CardFooter>
+      </Card>
+    </div>
   </div>
 </template>
 
@@ -90,6 +137,21 @@
 import { ref, onMounted, computed } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import axios from '../services/api'
+
+// shadcn-vue components
+import { Button } from '@/components/ui/button'
+import { Input } from '@/components/ui/input'
+import { Label } from '@/components/ui/label'
+import {
+  Select,
+  SelectContent,
+  SelectGroup,
+  SelectItem,
+  SelectLabel,
+  SelectTrigger,
+  SelectValue
+} from '@/components/ui/select'
+import { Card, CardHeader, CardTitle, CardDescription, CardContent, CardFooter } from '@/components/ui/card'
 
 const route = useRoute()
 const router = useRouter()
@@ -127,7 +189,6 @@ const getUser = async () => {
     form.value.code_nfc = user.code_nfc || ''
     form.value.roles = user.roles.length > 0 ? user.roles[0].name : ''
 
-    // Pisahkan nomor telepon dari +62
     if (user.phone && user.phone.startsWith('+62')) {
       form.value.phone_without_prefix = user.phone.slice(3)
     } else {
