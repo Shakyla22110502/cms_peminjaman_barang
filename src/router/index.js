@@ -47,8 +47,14 @@ const routes = [
         component: ItemList,
         meta: { requiresAuth: true, requiredPermission: 'view-items' },
       },
-      { path: 'items/create', component: ItemForm },
-      { path: 'items/edit/:id', component: ItemForm },
+      { path: 'items/create',
+        name: 'ItemCreate',
+        component: ItemForm },
+
+      { path: 'items/edit/:id',
+        name: 'ItemEdit', 
+        component: ItemForm },
+
 
       // Borrowings
       {
@@ -75,6 +81,7 @@ const routes = [
       // Roles & Permissions
       {
         path: '/roles',
+        name: 'RolesList',
         component: Roles,
         meta: {
           requiresAuth: true,
@@ -187,7 +194,7 @@ const routes = [
         component: LocationList,
         meta: {
           requiresAuth: true,
-          requiredPermission: 'view-location',
+          requiredPermission: 'view-locations',
         },
       },
       {
@@ -196,7 +203,7 @@ const routes = [
         component: LocationForm,
         meta: {
           requiresAuth: true,
-          requiredPermission: 'create-location',
+          requiredPermission: 'create-locations',
         },
       },
       {
@@ -206,7 +213,7 @@ const routes = [
         props: true,
         meta: {
           requiresAuth: true,
-          requiredPermission: 'edit-location',
+          requiredPermission: 'edit-locations',
         },
       },
 

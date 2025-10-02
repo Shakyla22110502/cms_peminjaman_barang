@@ -10,7 +10,7 @@
           </div>
 
           <Button
-            v-if="hasPermission('create-location')"
+            v-if="hasPermission('create-locations')"
             @click="router.push('/locations/create')"
             variant="default"
             class="inline-flex items-center gap-2"
@@ -31,7 +31,7 @@
               <th class="px-6 py-3 text-left text-xs font-medium text-blue-500 uppercase tracking-wider">
                 Secret ID
               </th>
-              <th v-if="hasPermission('edit-location')" class="px-6 py-3 text-left text-xs font-medium text-blue-500 uppercase tracking-wider">
+              <th v-if="hasPermission('edit-locations')" class="px-6 py-3 text-left text-xs font-medium text-blue-500 uppercase tracking-wider">
                 Aksi
               </th>
             </tr>
@@ -45,14 +45,19 @@
                   <Copy class="w-4 h-4" />
                 </Button>
               </td>
-              <td v-if="hasPermission('edit-location')" class="px-6 py-4 flex gap-2">
-                <Button size="sm" variant="secondary" @click="router.push(`/locations/${location.id}/edit`)">
-                  <Edit class="w-3 h-3 mr-1" /> Edit
+              <td v-if="hasPermission('edit-locations')" class="px-6 py-4">
+              <div class="flex items-center justify-start gap-2">
+                <Button size="sm" variant="secondary" class="flex items-center gap-1"
+                  @click="router.push(`/locations/${location.id}/edit`)">
+                  <Edit class="w-4 h-4" /> Edit
                 </Button>
-                <Button size="sm" variant="destructive" @click="deleteLocation(location.id)">
-                  <Trash class="w-3 h-3 mr-1" /> Hapus
+
+                <Button size="sm" variant="destructive" class="flex items-center gap-1"
+                  @click="deleteLocation(location.id)">
+                  <Trash class="w-4 h-4" /> Hapus
                 </Button>
-              </td>
+              </div>
+            </td>
             </tr>
             <tr v-if="locations.length === 0">
               <td colspan="3" class="text-center py-6 text-gray-500">Belum ada lokasi</td>

@@ -2,131 +2,128 @@
   <div class="min-h-screen bg-gray-50 p-6">
     <div class="max-w-7xl mx-auto">
       <!-- Header -->
-      <div class="bg-white rounded-lg shadow-sm border p-6 mb-6">
-        <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
-          <div>
-            <h1 class="text-3xl font-bold text-gray-900">Manajemen Peminjaman Mingguan</h1>
-            <p class="text-gray-600 mt-1">Kelola jadwal peminjaman mingguan</p>
+      <Card class="mb-6">
+        <CardHeader>
+          <div class="flex flex-col sm:flex-row justify-between gap-4">
+            <div>
+              <CardTitle class="text-2xl font-bold">Manajemen Peminjaman Mingguan</CardTitle>
+              <CardDescription>Kelola jadwal peminjaman mingguan</CardDescription>
+            </div>
+            <router-link
+              v-if="hasPermission('create-weekly-room-loans')"
+              to="/weekly-room-loans/create"
+            >
+              <Button>
+                <Plus class="w-4 h-4 mr-2" />
+                Tambah Peminjaman Mingguan
+              </Button>
+            </router-link>
           </div>
-          <router-link
-            v-if="hasPermission('create-weekly-room-loans')"
-            to="/weekly-room-loans/create"
-            class="inline-flex items-center px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-lg shadow-sm transition-colors duration-200"
-          >
-            <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
-            </svg>
-            Tambah Peminjaman Mingguan
-          </router-link>
-        </div>
-      </div>
+        </CardHeader>
+      </Card>
 
       <!-- Filter -->
-      <div class="bg-white rounded-lg shadow-sm border mb-6">
-        <div class="px-6 py-4 border-b border-gray-200 bg-gray-50 flex flex-col sm:flex-row gap-4 sm:items-end">
+      <Card class="mb-6">
+        <CardContent class="flex flex-col sm:flex-row gap-4 sm:items-end">
           <div class="w-full sm:w-1/3">
-            <label class="block text-sm font-medium text-gray-700 mb-1">Cari Nama Peminjam</label>
-            <input
-              type="text"
+            <Label for="name">Cari Nama Peminjam</Label>
+            <Input
+              id="name"
               v-model="filters.name"
-              class="w-full border border-gray-300 rounded-lg shadow-sm px-4 py-2 focus:ring-blue-500 focus:border-blue-500"
               placeholder="Nama Peminjam"
             />
           </div>
           <div class="w-full sm:w-1/3">
-            <label class="block text-sm font-medium text-gray-700 mb-1">Status</label>
-            <select
-              v-model="filters.status"
-              class="w-full border border-gray-300 rounded-lg shadow-sm px-4 py-2 focus:ring-blue-500 focus:border-blue-500"
-            >
-              <option value="">Semua</option>
-              <option value="pending">Menunggu</option>
-              <option value="approved">Disetujui</option>
-              <option value="rejected">Ditolak</option>
-            </select>
+            <Label for="status">Status</Label>
+            <Select v-model="filters.status">
+              <SelectTrigger>
+                <SelectValue placeholder="Semua" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">Semua</SelectItem>
+                <SelectItem value="pending">Menunggu</SelectItem>
+                <SelectItem value="approved">Disetujui</SelectItem>
+                <SelectItem value="rejected">Ditolak</SelectItem>
+              </SelectContent>
+            </Select>
           </div>
-        </div>
-      </div>
+        </CardContent>
+      </Card>
 
       <!-- Table -->
-      <div class="bg-white rounded-lg shadow-sm border overflow-hidden">
-        <div v-if="loading" class="p-6 text-gray-600">Memuat data...</div>
-        <div v-else-if="error" class="p-6 text-red-600">{{ error }}</div>
+      <Card>
+        <CardContent>
+          <div v-if="loading" class="p-6 text-gray-600">Memuat data...</div>
+          <div v-else-if="error" class="p-6 text-red-600">{{ error }}</div>
 
-        <div v-else class="overflow-x-auto">
-          <table class="min-w-full divide-y divide-gray-200">
-            <thead class="bg-gray-50">
-              <tr>
-                <th class="px-6 py-3 text-left text-xs font-medium text-blue-500 uppercase tracking-wider">Ruangan</th>
-                <th class="px-6 py-3 text-left text-xs font-medium text-blue-500 uppercase tracking-wider">Peminjam</th>
-                <th class="px-6 py-3 text-left text-xs font-medium text-blue-500 uppercase tracking-wider">Kontak</th>
-                <th class="px-6 py-3 text-left text-xs font-medium text-blue-500 uppercase tracking-wider">Hari</th>
-                <th class="px-6 py-3 text-left text-xs font-medium text-blue-500 uppercase tracking-wider">Waktu</th>
-                <th class="px-6 py-3 text-left text-xs font-medium text-blue-500 uppercase tracking-wider">Periode</th>
-                <th class="px-6 py-3 text-left text-xs font-medium text-blue-500 uppercase tracking-wider">Status</th>
-                <th v-if="hasPermission('edit-weekly-room-loans')" class="px-6 py-3 text-right text-xs font-medium text-blue-500 uppercase tracking-wider">Aksi</th>
-              </tr>
-            </thead>
-            <tbody class="bg-white divide-y divide-gray-200">
-              <tr
-                v-for="loan in filteredLoans"
-                :key="loan.id"
-                class="hover:bg-gray-50 transition-colors duration-150"
-              >
-                <td class="px-6 py-4 text-sm text-gray-900">{{ loan.room?.name || '-' }}</td>
-                <td class="px-6 py-4 text-sm text-gray-900">{{ loan.borrower_name }}</td>
-                <td class="px-6 py-4 text-sm text-gray-900">{{ loan.borrower_contact || '-' }}</td>
-                <td class="px-6 py-4 text-sm text-gray-900">{{ dayNames[loan.day_of_week] }}</td>
-                <td class="px-6 py-4 text-sm text-gray-900">{{ loan.start_time }} - {{ loan.end_time }}</td>
-                <td class="px-6 py-4 text-sm text-gray-900">
-                  {{ loan.start_date }}<br />
-                  <span class="text-gray-400">s/d</span><br />
-                  {{ loan.end_date }}
-                </td>
-                <td class="px-6 py-4">
-                  <span
-                    class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium"
-                    :class="{
-                      'bg-green-100 text-green-800': loan.status === 'approved',
-                      'bg-yellow-100 text-yellow-800': loan.status === 'pending',
-                      'bg-red-100 text-red-800': loan.status === 'rejected'
-                    }"
-                  >
-                    {{ statusLabel(loan.status) }}
-                  </span>
-                </td>
-                <td class="px-6 py-4 text-right text-sm font-medium">
-                  <div class="flex justify-end space-x-3">
-                    <router-link
-                      v-if="hasPermission('edit-weekly-room-loans')"
-                      :to="`/weekly-room-loans/${loan.id}/edit`"
-                      class="inline-flex items-center px-3 py-1.5 border border-gray-300 text-xs font-medium rounded-md bg-yellow-100 text-yellow-800 hover:bg-yellow-200 transition"
+          <div v-else>
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead>Ruangan</TableHead>
+                  <TableHead>Peminjam</TableHead>
+                  <TableHead>Kontak</TableHead>
+                  <TableHead>Hari</TableHead>
+                  <TableHead>Waktu</TableHead>
+                  <TableHead>Periode</TableHead>
+                  <TableHead>Status</TableHead>
+                  <TableHead v-if="hasPermission('edit-weekly-room-loans')" class="text-right">
+                    Aksi
+                  </TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                <TableRow
+                  v-for="loan in filteredLoans"
+                  :key="loan.id"
+                >
+                  <TableCell>{{ loan.room?.name || '-' }}</TableCell>
+                  <TableCell>{{ loan.borrower_name }}</TableCell>
+                  <TableCell>{{ loan.borrower_contact || '-' }}</TableCell>
+                  <TableCell>{{ dayNames[loan.day_of_week] }}</TableCell>
+                  <TableCell>{{ loan.start_time }} - {{ loan.end_time }}</TableCell>
+                  <TableCell>
+                    {{ loan.start_date }}<br />
+                    <span class="text-gray-400">s/d</span><br />
+                    {{ loan.end_date }}
+                  </TableCell>
+                  <TableCell>
+                    <Badge
+                      :variant="loan.status === 'approved' ? 'success' : loan.status === 'pending' ? 'warning' : 'destructive'"
                     >
-                      Edit
-                    </router-link>
-                    <button
-                      v-if="hasPermission('delete-weekly-room-loans')"
-                      @click="remove(loan.id)"
-                      class="inline-flex items-center px-3 py-1.5 border border-red-300 shadow-sm text-xs font-medium rounded-md text-red-700 bg-red-50 hover:bg-red-100"
-                    >
-                      Hapus
-                    </button>
-                  </div>
-                </td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
+                      {{ statusLabel(loan.status) }}
+                    </Badge>
+                  </TableCell>
+                  <TableCell v-if="hasPermission('edit-weekly-room-loans')" class="text-right">
+                    <div class="flex justify-end space-x-2">
+                      <router-link
+                        :to="`/weekly-room-loans/${loan.id}/edit`"
+                        v-if="hasPermission('edit-weekly-room-loans')"
+                      >
+                        <Button variant="outline" size="sm">Edit</Button>
+                      </router-link>
+                      <Button
+                        v-if="hasPermission('delete-weekly-room-loans')"
+                        variant="destructive"
+                        size="sm"
+                        @click="remove(loan.id)"
+                      >
+                        Hapus
+                      </Button>
+                    </div>
+                  </TableCell>
+                </TableRow>
+              </TableBody>
+            </Table>
+          </div>
 
-        <div v-if="!loading && filteredLoans.length === 0" class="text-center py-12">
-          <svg class="mx-auto h-12 w-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-              d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"/>
-          </svg>
-          <h3 class="mt-2 text-sm font-medium text-gray-900">Tidak ada hasil ditemukan</h3>
-          <p class="mt-1 text-sm text-gray-500">Coba ubah filter atau tambahkan data baru.</p>
-        </div>
-      </div>
+          <div v-if="!loading && filteredLoans.length === 0" class="text-center py-12">
+            <FolderX class="mx-auto h-12 w-12 text-gray-400" />
+            <h3 class="mt-2 text-sm font-medium text-gray-900">Tidak ada hasil ditemukan</h3>
+            <p class="mt-1 text-sm text-gray-500">Coba ubah filter atau tambahkan data baru.</p>
+          </div>
+        </CardContent>
+      </Card>
     </div>
   </div>
 </template>
@@ -135,11 +132,24 @@
 import { ref, onMounted, computed } from 'vue'
 import axios from '../services/api'
 import { useUserStore } from '../stores/UserStore'
+import {
+  Card, CardHeader, CardTitle, CardDescription, CardContent,
+} from '@/components/ui/card'
+import { Button } from '@/components/ui/button'
+import { Input } from '@/components/ui/input'
+import { Label } from '@/components/ui/label'
+import {
+  Select, SelectTrigger, SelectValue, SelectContent, SelectItem,
+} from '@/components/ui/select'
+import {
+  Table, TableHeader, TableRow, TableHead, TableBody, TableCell,
+} from '@/components/ui/table'
+import { Badge } from '@/components/ui/badge'
+import { Plus, FolderX } from 'lucide-vue-next'
 
 const loans = ref([])
 const loading = ref(true)
 const error = ref(null)
-
 
 const userStore = useUserStore()
 const hasPermission = (perm) => userStore.permissions.includes(perm)

@@ -1,70 +1,76 @@
- <template>
+<template>
   <div class="min-h-screen flex items-center justify-center bg-gray-50 py-8">
-    <div class="bg-white rounded-xl shadow-md w-full max-w-xl p-8">
-      <h2 class="text-2xl font-bold mb-6 text-gray-900">
-        {{ roomId ? 'Edit Ruangan' : 'Tambah Ruangan' }}
-      </h2>
-      <form @submit.prevent="saveRoom" class="space-y-5">
-        <div>
-          <label class="block font-medium mb-1 text-gray-700">Nama Ruangan</label>
-          <input
-            v-model="form.name"
-            type="text"
-            class="w-full border-gray-300 rounded-lg shadow-sm focus:ring-blue-500 focus:border-blue-500 px-4 py-2"
-            required
-            placeholder="Contoh: Ruang Rapat 1"
-          />
-        </div>
-        <div>
-          <label class="block font-medium mb-1 text-gray-700">Lokasi</label>
-          <input
-            v-model="form.location"
-            type="text"
-            class="w-full border-gray-300 rounded-lg shadow-sm focus:ring-blue-500 focus:border-blue-500 px-4 py-2"
-            placeholder="Contoh: Lantai 2"
-          />
-        </div>
-        <div>
-          <label class="block font-medium mb-1 text-gray-700">Kapasitas</label>
-          <input
-            v-model.number="form.capacity"
-            type="number"
-            min="0"
-            class="w-full border-gray-300 rounded-lg shadow-sm focus:ring-blue-500 focus:border-blue-500 px-4 py-2"
-            placeholder="Contoh: 20"
-          />
-        </div>
-        <div>
-          <label class="block font-medium mb-1 text-gray-700">Deskripsi</label>
-          <textarea
-            v-model="form.description"
-            class="w-full border-gray-300 rounded-lg shadow-sm focus:ring-blue-500 focus:border-blue-500 px-4 py-2"
-            rows="3"
-            placeholder="Deskripsi tambahan (opsional)"
-          ></textarea>
-        </div>
-        <div>
-          <label class="inline-flex items-center">
-            <input type="checkbox" v-model="form.is_active" class="mr-2" />
-            Aktif
-          </label>
-        </div>
-        <div class="flex justify-end gap-2 pt-4">
-          <router-link
-            to="/rooms"
-            class="px-4 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 transition"
-          >
-            Batal
-          </router-link>
-          <button
-            type="submit"
-            class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition"
-          >
-            Simpan
-          </button>
-        </div>
-      </form>
-    </div>
+    <Card class="w-full max-w-xl">
+      <CardHeader>
+        <CardTitle class="text-xl font-bold">
+          {{ roomId ? 'Edit Ruangan' : 'Tambah Ruangan' }}
+        </CardTitle>
+      </CardHeader>
+
+      <CardContent>
+        <form @submit.prevent="saveRoom" class="space-y-5">
+          <!-- Nama Ruangan -->
+          <div class="space-y-1">
+            <Label for="name">Nama Ruangan</Label>
+            <Input
+              id="name"
+              v-model="form.name"
+              type="text"
+              required
+              placeholder="Contoh: Ruang Rapat 1"
+            />
+          </div>
+
+          <!-- Lokasi -->
+          <div class="space-y-1">
+            <Label for="location">Lokasi</Label>
+            <Input
+              id="location"
+              v-model="form.location"
+              type="text"
+              placeholder="Contoh: Lantai 2"
+            />
+          </div>
+
+          <!-- Kapasitas -->
+          <div class="space-y-1">
+            <Label for="capacity">Kapasitas</Label>
+            <Input
+              id="capacity"
+              v-model.number="form.capacity"
+              type="number"
+              min="0"
+              placeholder="Contoh: 20"
+            />
+          </div>
+
+          <!-- Deskripsi -->
+          <div class="space-y-1">
+            <Label for="description">Deskripsi</Label>
+            <Textarea
+              id="description"
+              v-model="form.description"
+              rows="3"
+              placeholder="Deskripsi tambahan (opsional)"
+            />
+          </div>
+
+          <!-- Aktif -->
+          <div class="flex items-center space-x-2">
+            <Checkbox id="is_active" v-model:checked="form.is_active" />
+            <Label for="is_active">Aktif</Label>
+          </div>
+
+          <!-- Tombol Aksi -->
+          <div class="flex justify-end gap-2 pt-4">
+            <router-link to="/rooms">
+              <Button variant="outline">Batal</Button>
+            </router-link>
+            <Button type="submit">Simpan</Button>
+          </div>
+        </form>
+      </CardContent>
+    </Card>
   </div>
 </template>
 
@@ -72,6 +78,14 @@
 import { ref, onMounted } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import axios from '../services/api'
+
+// shadcn-vue components
+import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card'
+import { Input } from '@/components/ui/input'
+import { Textarea } from '@/components/ui/textarea'
+import { Checkbox } from '@/components/ui/checkbox'
+import { Button } from '@/components/ui/button'
+import { Label } from '@/components/ui/label'
 
 const route = useRoute()
 const router = useRouter()
@@ -81,7 +95,7 @@ const form = ref({
   location: '',
   capacity: '',
   description: '',
-  is_active: true
+  is_active: true,
 })
 
 const roomId = route.params.id
@@ -91,11 +105,10 @@ onMounted(async () => {
     const res = await axios.get(`/rooms/${roomId}`)
     form.value = {
       ...res.data.data,
-      is_active: !!res.data.data.is_active
+      is_active: !!res.data.data.is_active,
     }
   }
 })
-
 
 const saveRoom = async () => {
   if (!form.value.name) return

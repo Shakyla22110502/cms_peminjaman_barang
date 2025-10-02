@@ -23,12 +23,11 @@
 
       <!-- Table -->
       <Card>
-        <!-- Filter -->
         <CardHeader>
-          <Input 
-            v-model="search" 
-            type="text" 
-            placeholder="Cari nama role..." 
+          <Input
+            v-model="search"
+            type="text"
+            placeholder="Cari nama role..."
             class="w-full sm:w-80"
           />
         </CardHeader>
@@ -53,8 +52,8 @@
                 <TableCell class="font-medium">{{ role.name }}</TableCell>
                 <TableCell>
                   <div class="flex flex-wrap gap-2">
-                    <Badge 
-                      v-for="perm in role.permissions" 
+                    <Badge
+                      v-for="perm in role.permissions"
                       :key="perm.id"
                     >
                       {{ perm.name }}
@@ -106,9 +105,9 @@
           <form @submit.prevent="saveRole" class="space-y-6">
             <div class="space-y-2">
               <Label>Nama Role</Label>
-              <Input 
-                v-model="form.name" 
-                required 
+              <Input
+                v-model="form.name"
+                required
                 placeholder="Masukkan nama role"
               />
             </div>
@@ -125,9 +124,8 @@
                   class="flex items-center space-x-2"
                 >
                   <Checkbox
+                    v-model:checked="formPermissionsModel[permission.name]"
                     :id="'perm-' + permission.id"
-                    v-model:checked="form.permissions"
-                    :value="permission.name"
                   />
                   <label :for="'perm-' + permission.id" class="text-sm cursor-pointer">
                     {{ permission.name }}
@@ -137,9 +135,9 @@
             </div>
 
             <DialogFooter class="flex gap-2 justify-end">
-              <Button 
-                type="button" 
-                variant="outline" 
+              <Button
+                type="button"
+                variant="outline"
                 @click="closeModal"
               >
                 Batal
@@ -156,7 +154,7 @@
 </template>
 
 <script setup>
-import { ref, onMounted, computed } from 'vue'
+import { ref, onMounted, computed, reactive, watch } from 'vue'
 import axios from '../services/api'
 import { useUserStore } from '../stores/UserStore'
 
@@ -183,8 +181,15 @@ const allPermissions = ref([])
 const showModal = ref(false)
 const editingRole = ref(null)
 const form = ref({ name: '', permissions: [] })
-const search = ref('')
 
+// sinkronisasi permission array <-> object untuk checkbox
+const formPermissionsModel = reactive({})
+
+watch(formPermissionsModel, (newModel) => {
+  form.value.permissions = Object.keys(newModel).filter(k => newModel[k])
+}, { deep: true })
+
+const search = ref('')
 const filteredRoles = computed(() => {
   return roles.value.filter(role =>
     role.name.toLowerCase().includes(search.value.toLowerCase())
@@ -205,45 +210,64 @@ const fetchPermissions = async () => {
   try {
     const res = await axios.get('/permissions')
     allPermissions.value = res.data
+    allPermissions.value.forEach(perm => {
+      if (!(perm.name in formPermissionsModel)) {
+        formPermissionsModel[perm.name] = false
+      }
+    })
   } catch (err) {
     console.error('Error fetching permissions:', err)
     allPermissions.value = []
   }
 }
 
-const openModal = (role) => {
+const openModal = async (role) => {
   showModal.value = true
   editingRole.value = role
+
+  if (allPermissions.value.length === 0) {
+    await fetchPermissions()
+  }
+
+  Object.keys(formPermissionsModel).forEach(k => { formPermissionsModel[k] = false })
+
   if (role) {
-    form.value = {
-      name: role.name,
-      permissions: role.permissions.map(p => p.name)
-    }
+    form.value.name = role.name
+    form.value.permissions = role.permissions.map(p => p.name)
+    form.value.permissions.forEach(p => {
+      if (Object.prototype.hasOwnProperty.call(formPermissionsModel, p)) {
+        formPermissionsModel[p] = true
+      }
+    })
   } else {
     form.value = { name: '', permissions: [] }
   }
 }
 
-const closeModal = () => {
-  showModal.value = false
-  editingRole.value = null
-}
-
 const saveRole = async () => {
   try {
+    // kirim ID permissions (lebih aman untuk backend)
     const payload = {
       name: form.value.name,
-      permissions: form.value.permissions
+      permissions: allPermissions.value
+        .filter(p => formPermissionsModel[p.name])
+        .map(p => p.id)
     }
 
+    console.log('Form Permissions Model:', JSON.stringify(formPermissionsModel, null, 2))
+    console.log('Payload dikirim:', payload)
+
+    let response
     if (editingRole.value) {
-      await axios.put(`/roles/${editingRole.value.id}`, payload)
+      response = await axios.put(`/roles/${editingRole.value.id}`, payload)
     } else {
-      await axios.post('/roles', payload)
+      response = await axios.post('/roles', payload)
     }
 
+    console.log('Response dari server:', response.data)
+
+    await fetchRoles()
     closeModal()
-    fetchRoles()
     alert('Role berhasil disimpan!')
   } catch (err) {
     console.error('Error saving role:', err)
@@ -255,13 +279,19 @@ const deleteRole = async (id) => {
   if (confirm('Yakin ingin menghapus role ini?')) {
     try {
       await axios.delete(`/roles/${id}`)
-      fetchRoles()
+      await fetchRoles()
       alert('Role berhasil dihapus!')
     } catch (err) {
       console.error('Error deleting role:', err)
       alert('Gagal menghapus role.')
     }
   }
+}
+
+const closeModal = () => {
+  showModal.value = false
+  editingRole.value = null
+  form.value = { name: '', permissions: [] }
 }
 
 onMounted(() => {

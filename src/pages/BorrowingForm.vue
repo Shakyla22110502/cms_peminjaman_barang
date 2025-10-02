@@ -4,7 +4,7 @@
       <Card>
         <!-- Header -->
         <CardHeader>
-          <CardTitle>
+          <CardTitle class="text-xl font-bold">
             {{ isEdit ? "Edit Peminjaman" : "Tambah Peminjaman" }}
           </CardTitle>
           <CardDescription>
